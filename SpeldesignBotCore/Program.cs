@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SpeldesignBotCore.Discord;
+using SpeldesignBotCore.Discord.Entities;
 
 namespace SpeldesignBotCore
 {
@@ -7,7 +8,12 @@ namespace SpeldesignBotCore
         private static void Main()
         {
             Unity.RegisterTypes();
-            Console.WriteLine("Hello World!");
+
+            var discordBotConfig = new BotConfiguration
+            {
+                Token = "",
+                SocketConfig = SocketConfig.GetDefault()
+            };
         }
     }
 }
