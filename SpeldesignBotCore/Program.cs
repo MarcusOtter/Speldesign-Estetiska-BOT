@@ -1,4 +1,5 @@
-﻿using SpeldesignBotCore.Discord;
+﻿using System;
+using SpeldesignBotCore.Discord;
 using SpeldesignBotCore.Discord.Entities;
 
 namespace SpeldesignBotCore
@@ -14,6 +15,8 @@ namespace SpeldesignBotCore
                 Token = "",
                 SocketConfig = SocketConfig.GetDefault()
             };
+
+            var connection = Unity.Resolve<Connection>();
         }
     }
 }

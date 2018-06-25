@@ -1,4 +1,5 @@
-﻿using SpeldesignBotCore.Storage;
+﻿using SpeldesignBotCore.Discord;
+using SpeldesignBotCore.Storage;
 using SpeldesignBotCore.Storage.Implementations;
 using Unity;
 using Unity.Lifetime;
@@ -23,6 +24,7 @@ namespace SpeldesignBotCore
         {
             _container = new UnityContainer();
             _container.RegisterType<IDataStorage, InMemoryStorage>(new ContainerControlledLifetimeManager());
+            _container.RegisterType<Connection>(new ContainerControlledLifetimeManager());
         }
 
         public static T Resolve<T>()
