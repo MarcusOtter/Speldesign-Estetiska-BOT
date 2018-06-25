@@ -24,6 +24,7 @@ namespace SpeldesignBotCore
         {
             _container = new UnityContainer();
             _container.RegisterType<IDataStorage, InMemoryStorage>(new ContainerControlledLifetimeManager());
+            _container.RegisterType<ILogger, ConsoleLogger>(new ContainerControlledLifetimeManager());
             _container.RegisterType<Connection>(new ContainerControlledLifetimeManager());
         }
 
