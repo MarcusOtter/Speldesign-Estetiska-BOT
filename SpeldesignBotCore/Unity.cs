@@ -1,8 +1,9 @@
-﻿using SpeldesignBotCore.Discord;
+﻿using Discord.WebSocket;
+using SpeldesignBotCore.Discord;
 using SpeldesignBotCore.Storage;
 using SpeldesignBotCore.Storage.Implementations;
 using Unity;
-using Unity.Lifetime;
+using Unity.Injection;
 using Unity.Resolution;
 
 namespace SpeldesignBotCore
@@ -23,9 +24,11 @@ namespace SpeldesignBotCore
         public static void RegisterTypes()
         {
             _container = new UnityContainer();
-            _container.RegisterType<IDataStorage, InMemoryStorage>(new ContainerControlledLifetimeManager());
-            _container.RegisterType<ILogger, ConsoleLogger>(new ContainerControlledLifetimeManager());
-            _container.RegisterType<Connection>(new ContainerControlledLifetimeManager());
+            _container.RegisterSingleton<IDataStorage, JsonStorage>();
+            _container.RegisterSingleton<ILogger, ConsoleLogger>();
+            _container.RegisterType<DiscordSocketConfig>(new InjectionFactory(i => SocketConfig.GetDefault())); // Return default config when asking for a DiscordSocketConfig
+            _container.RegisterSingleton<DiscordSocketClient>(new InjectionConstructor(typeof(DiscordSocketConfig))); // Make DiscordSocketClient use the constructor with DiscordSocketConfig
+            _container.RegisterSingleton<Connection>();
         }
 
         public static T Resolve<T>()

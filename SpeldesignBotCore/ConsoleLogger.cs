@@ -6,7 +6,7 @@ namespace SpeldesignBotCore
     {
         public void Log(string message)
         {
-            Console.WriteLine($"Message '{message}' was sent at {DateTime.UtcNow} (UTC)");
+            Console.WriteLine($"{DateTime.Now}:  {message}");
         }
     }
 }
