@@ -1,6 +1,6 @@
 ﻿namespace SpeldesignBotCore
 {
-    public interface ILogger
+    public interface IStatusLogger
     {
         void Log(string message);
     }

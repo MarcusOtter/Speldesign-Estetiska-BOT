@@ -11,7 +11,7 @@ namespace SpeldesignBotCore
         private static async Task Main()
         {
             Unity.RegisterTypes();
-            Console.WriteLine("Registered types");
+            Console.WriteLine($"{DateTime.Now}: Registered Unity types");
 
             var storage = Unity.Resolve<IDataStorage>();
 
@@ -20,8 +20,6 @@ namespace SpeldesignBotCore
             {
                 Token = storage.RestoreObject<string>("Config/BotToken")
             });
-
-            Console.ReadKey();
         }
     }
 }

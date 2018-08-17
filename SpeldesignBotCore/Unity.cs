@@ -25,7 +25,8 @@ namespace SpeldesignBotCore
         {
             _container = new UnityContainer();
             _container.RegisterSingleton<IDataStorage, JsonStorage>();
-            _container.RegisterSingleton<ILogger, ConsoleLogger>();
+            _container.RegisterSingleton<IStatusLogger, ConsoleStatusLogger>();
+            _container.RegisterSingleton<IMessageLogger, DiscordMessageActualLogger>();
             _container.RegisterType<DiscordSocketConfig>(new InjectionFactory(i => SocketConfig.GetDefault())); // Return default config when asking for a DiscordSocketConfig
             _container.RegisterSingleton<DiscordSocketClient>(new InjectionConstructor(typeof(DiscordSocketConfig))); // Make DiscordSocketClient use the constructor with DiscordSocketConfig
             _container.RegisterSingleton<Connection>();

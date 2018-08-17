@@ -13,25 +13,28 @@ namespace SpeldesignBotCore.Discord
     public class Connection
     {
         private readonly DiscordSocketClient _client;
-        private readonly DiscordLogger _logger;
+        private readonly DiscordStatusLogger _statusLogger;
+        private readonly DiscordMessageLogger _messageLogger;
 
-        public Connection(DiscordLogger logger, DiscordSocketClient client)
+        public Connection(DiscordSocketClient client, DiscordStatusLogger statusLogger, DiscordMessageLogger messageLogger)
         {
-            _logger = logger;
+            _statusLogger = statusLogger;
             _client = client;
+            _messageLogger = messageLogger;
         }
 
         internal async Task ConnectAsync(BotConfiguration config)
         {
-            _client.Log += _logger.Log;
+            _client.Log += _statusLogger.Log;
             await _client.LoginAsync(TokenType.Bot, config.Token);
             await _client.StartAsync();
 
             _client.MessageReceived += TempDiscordMessageHandler;
-            await _client.SetGameAsync("the chat ;)", type: ActivityType.Watching);
+            await _client.SetGameAsync("cute animals on imgur", type: ActivityType.Watching);
 
             await Task.Delay(-1);
         }
+
 
         private async Task TempDiscordMessageHandler(SocketMessage s)
         {
@@ -40,8 +43,10 @@ namespace SpeldesignBotCore.Discord
 
             if (context.User.IsBot) return;
 
+            _messageLogger.LogMsgSent(msg);
+
             // TODO: Move this channel ID to json instead of hardcoded
-            await LogMessageContents(context, 458197224489353239);
+            //await LogMessageContents(context, 458197224489353239);
 
             if (context.Channel.Id == 458193387237933056)
             {
@@ -79,7 +84,7 @@ namespace SpeldesignBotCore.Discord
             }
             catch
             {
-                await SendRegistrationErrorMessage(context, $"Your first word, '{splitMsg[0]}', is not a valid class role.\nMake sure to write '@' and then your class name. (3 capital letters followed by 2 numbers)");
+                await SendRegistrationErrorMessage(context, $"Your first word, '{splitMsg[0]}', is not a valid class role.\nMake sure to write '@' and then your class name. (3 capital letters followed by 2 numbers. Example: @SPE16)");
                 return;
             }
 
@@ -121,7 +126,7 @@ namespace SpeldesignBotCore.Discord
             stringBuilder.Append(":warning: Whoops! :warning:\n");
             stringBuilder.Append($"It looks like you ({context.User.Mention}) did not follow the registration template correctly.\n");
             stringBuilder.Append($"\nError message:\n```fix\n{exceptionMessage}```");
-            stringBuilder.Append("\nIf you believe that this is an error, send a message to `CalmEyE#8246 (Alexander Eriksson)` or `LeMorrow#8093 (Marcus Otterström).`");
+            stringBuilder.Append("\nIf you believe that this is an error, send a message to `CalmEyE#8246 (Alexander Eriksson)` or `LeMorrow#8192 (Marcus Otterström).`");
 
             await context.Channel.SendMessageAsync(stringBuilder.ToString());
             Console.WriteLine($"WARNING: Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
