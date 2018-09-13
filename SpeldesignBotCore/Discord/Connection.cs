@@ -30,7 +30,7 @@ namespace SpeldesignBotCore.Discord
             await _client.StartAsync();
 
             _client.MessageReceived += TempDiscordMessageHandler;
-            await _client.SetGameAsync("cute animals on imgur", type: ActivityType.Watching);
+            //await _client.SetGameAsync("cute animals on imgur", type: ActivityType.Watching);
 
             await Task.Delay(-1);
         }
@@ -93,7 +93,8 @@ namespace SpeldesignBotCore.Discord
             {
                 458191879884898325,
                 458192131874488330,
-                458192128980549633
+                458192128980549633,
+                489738222054670336
             };
 
             if (!validRoleIds.Contains(roleToAdd.Id))

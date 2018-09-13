@@ -7,7 +7,10 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void DebugTest()
         {
+            const int expected = 3;
 
+            var actual = Utilities.MyUtility(expected);
+            Assert.Equal(expected, actual);
         }
     }
 }
