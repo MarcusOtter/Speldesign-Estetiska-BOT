@@ -3,61 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using SpeldesignBotCore.Discord.Entities;
+using SpeldesignBotCore.Entities;
+using SpeldesignBotCore.Loggers;
 
-namespace SpeldesignBotCore.Discord
+namespace SpeldesignBotCore
 {
-    public class Connection
+    public class DiscordMessageHandler
     {
         private readonly DiscordSocketClient _client;
-        private readonly DiscordStatusLogger _statusLogger;
+        private readonly BotConfiguration _botConfig;
         private readonly DiscordMessageLogger _messageLogger;
 
-        public Connection(DiscordSocketClient client, DiscordStatusLogger statusLogger, DiscordMessageLogger messageLogger)
+        public DiscordMessageHandler(DiscordSocketClient client, BotConfiguration config, DiscordMessageLogger logger)
         {
-            _statusLogger = statusLogger;
             _client = client;
-            _messageLogger = messageLogger;
+            _botConfig = config;
+            _messageLogger = logger;
         }
 
-        internal async Task ConnectAsync(BotConfiguration config)
+        public async Task HandleMessageAsync(SocketMessage message)
         {
-            _client.Log += _statusLogger.Log;
-            await _client.LoginAsync(TokenType.Bot, config.Token);
-            await _client.StartAsync();
-
-            _client.MessageReceived += TempDiscordMessageHandler;
-            //await _client.SetGameAsync("cute animals on imgur", type: ActivityType.Watching);
-
-            await Task.Delay(-1);
-        }
-
-
-        private async Task TempDiscordMessageHandler(SocketMessage s)
-        {
-            var msg = s as SocketUserMessage;
+            var msg = message as SocketUserMessage;
             var context = new SocketCommandContext(_client, msg);
 
             if (context.User.IsBot) return;
 
-            _messageLogger.LogMsgSent(msg);
+            await _messageLogger.LogToLoggingChannel(msg);
 
-            // TODO: Move this channel ID to json instead of hardcoded
-            //await LogMessageContents(context, 458197224489353239);
-
-            if (context.Channel.Id == 458193387237933056)
+            if (context.Channel.Id == _botConfig.RegistrationChannelId)
             {
-                await RegisterNewUser(context);
+                await TryRegisterNewUser(context);
             }
         }
-
-        private async Task RegisterNewUser(SocketCommandContext context)
+        
+        private async Task TryRegisterNewUser(SocketCommandContext context)
         {
             string msg = context.Message.Content;
-            SocketGuildUser socketUser = (SocketGuildUser) context.User;
+            var socketUser = (SocketGuildUser) context.User;
 
             string[] splitMsg = msg.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
@@ -110,12 +94,11 @@ namespace SpeldesignBotCore.Discord
 
             string fullName = string.Join(' ', names);
 
-            // TODO: Add check to see if the user is in the class
             try
             {
                 await socketUser.ModifyAsync(user => user.Nickname = fullName);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e);
             }
@@ -130,18 +113,7 @@ namespace SpeldesignBotCore.Discord
             stringBuilder.Append("\nIf you believe that this is an error, send a message to `CalmEyE#8246 (Alexander Eriksson)` or `LeMorrow#8192 (Marcus Otterström).`");
 
             await context.Channel.SendMessageAsync(stringBuilder.ToString());
-            Console.WriteLine($"WARNING: Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
-        }
-
-        private async Task LogMessageContents(SocketCommandContext context, ulong channelId)
-        {
-            var embed = new EmbedBuilder();
-            embed.WithAuthor(context.User);
-            embed.WithDescription(context.Message.Content);
-            embed.WithFooter($"Skickat i #{context.Channel} av {((SocketGuildUser)context.User).Nickname}");
-
-            var channel = (ISocketMessageChannel)_client.GetChannel(channelId);
-            await channel.SendMessageAsync("", embed: embed.Build());
+            Console.WriteLine($"Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
         }
     }
 }

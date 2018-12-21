@@ -1,5 +1,6 @@
 ﻿using Discord.WebSocket;
-using SpeldesignBotCore.Discord;
+using SpeldesignBotCore.Entities;
+using SpeldesignBotCore.Loggers;
 using SpeldesignBotCore.Storage;
 using SpeldesignBotCore.Storage.Implementations;
 using Unity;
@@ -24,12 +25,20 @@ namespace SpeldesignBotCore
         public static void RegisterTypes()
         {
             _container = new UnityContainer();
+
             _container.RegisterSingleton<IDataStorage, JsonStorage>();
-            _container.RegisterSingleton<IStatusLogger, ConsoleStatusLogger>();
-            _container.RegisterSingleton<IMessageLogger, DiscordMessageActualLogger>();
+            _container.RegisterSingleton<BotConfiguration>();
+
             _container.RegisterType<DiscordSocketConfig>(new InjectionFactory(i => SocketConfig.GetDefault())); // Return default config when asking for a DiscordSocketConfig
             _container.RegisterSingleton<DiscordSocketClient>(new InjectionConstructor(typeof(DiscordSocketConfig))); // Make DiscordSocketClient use the constructor with DiscordSocketConfig
+
+            _container.RegisterSingleton<StatusLogger>();
+            _container.RegisterSingleton<DiscordMessageHandler>();
+            _container.RegisterSingleton<DiscordMessageLogger>();
+
             _container.RegisterSingleton<Connection>();
+
+            Resolve<StatusLogger>().LogToConsole("Registered Unity types");
         }
 
         public static T Resolve<T>()

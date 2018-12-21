@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace SpeldesignBotCore.Discord
+namespace SpeldesignBotCore
 {
     public static class SocketConfig
     {
