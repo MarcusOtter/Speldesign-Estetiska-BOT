@@ -20,7 +20,7 @@ namespace SpeldesignBotCore.Loggers
         public async Task LogToLoggingChannel(SocketMessage message)
         {
             var embed = new EmbedBuilder();
-            embed.WithAuthor(message.Author.Username);
+            embed.WithAuthor(GetPrettyAuthorName(message.Author));
             embed.WithDescription(message.Content);
             embed.WithFooter($"Skickat i #{message.Channel.Name}");
             embed.WithColor(81, 193, 158);
@@ -36,6 +36,18 @@ namespace SpeldesignBotCore.Loggers
         public void LogMsgEdited(string username, string newMessage, string channelName)
         {
             // TODO
+        }
+
+        /// <summary>
+        /// Returns a <see langword="string"/> like "Nickname (Username#1234)" or "Username#1234" depending on if the user has a nickname or not.
+        /// </summary>
+        private string GetPrettyAuthorName(SocketUser user)
+        {
+            var nickname = ((SocketGuildUser)user).Nickname;
+
+            return string.IsNullOrWhiteSpace(nickname)
+                ? $"{user.Username}#{user.Discriminator}"
+                : $"{nickname} ({user.Username}#{user.Discriminator})";
         }
     }
 }
