@@ -8,12 +8,14 @@ namespace SpeldesignBotCore.Loggers
     public class DiscordMessageLogger
     {
         private readonly ulong _logChannelId;
+        private readonly DiscordSocketClient _client;
 
         private ISocketMessageChannel LogChannel 
-            => (ISocketMessageChannel) Unity.Resolve<DiscordSocketClient>().GetChannel(_logChannelId);
+            => (ISocketMessageChannel) _client.GetChannel(_logChannelId);
 
-        public DiscordMessageLogger()
+        public DiscordMessageLogger(DiscordSocketClient client)
         {
+            _client = client;
             _logChannelId = Unity.Resolve<BotConfiguration>().LoggingChannelId;
         }
 
@@ -43,7 +45,7 @@ namespace SpeldesignBotCore.Loggers
         /// </summary>
         private string GetPrettyAuthorName(SocketUser user)
         {
-            var nickname = ((SocketGuildUser)user).Nickname;
+            var nickname = ((SocketGuildUser) user).Nickname;
 
             return string.IsNullOrWhiteSpace(nickname)
                 ? $"{user.Username}#{user.Discriminator}"
