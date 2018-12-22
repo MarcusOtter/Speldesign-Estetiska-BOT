@@ -15,12 +15,14 @@ namespace SpeldesignBotCore
         private readonly DiscordSocketClient _client;
         private readonly BotConfiguration _botConfig;
         private readonly DiscordMessageLogger _messageLogger;
+        private readonly DiscordCommandHandler _commandHandler;
 
-        public DiscordMessageHandler(DiscordSocketClient client, BotConfiguration config, DiscordMessageLogger logger)
+        public DiscordMessageHandler(DiscordSocketClient client, BotConfiguration config, DiscordMessageLogger logger, DiscordCommandHandler commandHandler)
         {
             _client = client;
             _botConfig = config;
             _messageLogger = logger;
+            _commandHandler = commandHandler;
         }
 
         public async Task HandleMessageAsync(SocketMessage message)
@@ -28,20 +30,24 @@ namespace SpeldesignBotCore
             var msg = message as SocketUserMessage;
             var context = new SocketCommandContext(_client, msg);
 
-            if (context.User.IsBot) return;
+            if (context.User.IsBot) { return; }
+            if (msg is null) { return; }
 
             await _messageLogger.LogToLoggingChannel(msg);
 
             if (context.Channel.Id == _botConfig.RegistrationChannelId)
             {
                 await TryRegisterNewUser(context);
+                return;
             }
+
+            await _commandHandler.HandleCommand(msg, context);
         }
         
         private async Task TryRegisterNewUser(SocketCommandContext context)
         {
             string msg = context.Message.Content;
-            var socketUser = (SocketGuildUser) context.User;
+            var socketUser = context.User as SocketGuildUser;
 
             string[] splitMsg = msg.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 

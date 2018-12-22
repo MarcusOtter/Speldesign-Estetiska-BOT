@@ -1,21 +1,32 @@
-﻿using SpeldesignBotCore.Storage;
+﻿using System;
+using SpeldesignBotCore.Storage;
 
 namespace SpeldesignBotCore.Entities
 {
     public class BotConfiguration
     {
-        public readonly string Token;
-        public readonly ulong LoggingChannelId;
-        public readonly ulong RegistrationChannelId;
+        public string Token;
+        public string Prefix;
+        public ulong LoggingChannelId;
+        public ulong RegistrationChannelId;
+
+        public BotConfiguration()
+        {
+            // For the JSON serialization
+        }
 
         public BotConfiguration(IDataStorage storage)
         {
-            // TODO: I would like to just have 1 json file to read from (super easy fix).
-            // var obj = restore<botconfiguration>(path)
+            var botConfig = storage.RestoreObject<BotConfiguration>("Config/BotConfig");
 
-            Token = storage.RestoreObject<string>("Config/BotToken");
-            LoggingChannelId = storage.RestoreObject<ulong>("Config/LogChannel");
-            RegistrationChannelId = storage.RestoreObject<ulong>("Config/RegistrationChannel");
+            Token = botConfig.Token;
+            Prefix = botConfig.Prefix;
+            LoggingChannelId = botConfig.LoggingChannelId;
+            RegistrationChannelId = botConfig.RegistrationChannelId;
+
+            //Token = storage.RestoreObject<string>("Config/BotToken");
+            //LoggingChannelId = storage.RestoreObject<ulong>("Config/LogChannel");
+            //RegistrationChannelId = storage.RestoreObject<ulong>("Config/RegistrationChannel");
         }
     }
 }

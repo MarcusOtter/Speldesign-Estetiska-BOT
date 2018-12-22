@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Commands;
+using Discord.WebSocket;
 using SpeldesignBotCore.Entities;
 using SpeldesignBotCore.Loggers;
 using SpeldesignBotCore.Storage;
@@ -33,7 +34,9 @@ namespace SpeldesignBotCore
             _container.RegisterSingleton<DiscordSocketClient>(new InjectionConstructor(typeof(DiscordSocketConfig))); // Make DiscordSocketClient use the constructor with DiscordSocketConfig
 
             _container.RegisterSingleton<StatusLogger>();
-            _container.RegisterSingleton<DiscordMessageHandler>();
+
+            _container.RegisterSingleton<CommandService>();
+            _container.RegisterSingleton<DiscordCommandHandler>();
             _container.RegisterSingleton<DiscordMessageLogger>();
 
             _container.RegisterSingleton<Connection>();
