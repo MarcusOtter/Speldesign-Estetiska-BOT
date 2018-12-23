@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Newtonsoft.Json;
 using static System.IO.Directory;
 using static Newtonsoft.Json.JsonConvert;
 
@@ -16,7 +17,7 @@ namespace SpeldesignBotCore.Storage.Implementations
         {
             var filePath = $"{key}.json";
             CreateDirectory(Path.GetDirectoryName(filePath));
-            var json = SerializeObject(obj);
+            var json = SerializeObject(obj, Formatting.Indented);
             File.WriteAllText(filePath, json);
         }
     }

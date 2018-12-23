@@ -1,5 +1,4 @@
-﻿using System;
-using SpeldesignBotCore.Storage;
+﻿using SpeldesignBotCore.Storage;
 
 namespace SpeldesignBotCore.Entities
 {
@@ -12,7 +11,8 @@ namespace SpeldesignBotCore.Entities
 
         public BotConfiguration()
         {
-            // For the JSON serialization
+            // Sketchy because this is how Newtonsoft JSON needs to instantiate it,
+            // but Unity might pick this constructor over the other one when doing Unity.Resolve<BotConfiguration>()
         }
 
         public BotConfiguration(IDataStorage storage)
