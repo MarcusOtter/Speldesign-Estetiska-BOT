@@ -4,8 +4,8 @@
     public class GiveawayItem
     {
         public ulong OwnerDiscordId;
-        public GiveawayItemType ItemType;
         public string ItemName;
-        public string ItemLink;
+        public string SteamPageLink;
+        // TODO: Add website link, trailer link etc and then add everything that is not null in the giveawaycommand
     }
 }

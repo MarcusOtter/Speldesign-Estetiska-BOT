@@ -2,9 +2,9 @@
 {
     public enum GiveawayItemType
     {
-        Game,
-        Book,
-        Tutorial,
-        Other
+        Game = 0,
+        Book = 1,
+        Tutorial = 2,
+        Item = 3
     }
 }
