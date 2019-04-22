@@ -10,7 +10,7 @@ namespace SpeldesignBotCore.xUnit.Tests
             const int expected = 3;
 
             var actual = Utilities.MyUtility(expected);
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, actual + 1);
         }
     }
 }
