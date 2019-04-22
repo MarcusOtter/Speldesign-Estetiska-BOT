@@ -22,7 +22,7 @@ test_script:
 
     codecov -f "opencoverCoverage.xml"
     
-    dotnet test
+    dotnet test SpeldesignBotCore.xUnit.Tests/SpeldesignBotCore.xUnit.Tests.csproj
 on_success:
   - ps: Invoke-RestMethod https://raw.githubusercontent.com/DiscordHooks/appveyor-discord-webhook/master/send.ps1 -o send.ps1
   - ps: ./send.ps1 success $env:WEBHOOK_URL
