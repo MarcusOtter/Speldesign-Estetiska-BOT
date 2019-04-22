@@ -69,7 +69,7 @@ namespace SpeldesignBotCore.Modules.Giveaways
 
                 var gameNumber = items.IndexOf(item);
 
-                embedBuilder.AddField($"__{gameNumber + 1}. {item.ItemName}__", $"[Steam page]({item.SteamPageLink})", false);
+                embedBuilder.AddField($"__{gameNumber + 1}. {item.ItemName}__", $"[Preview]({item.PreviewLink})\nInfo to winner:\n```\n{item.InfoToWinner}```", false);
                 pickedItems[randomNumber] = true;
             }
 

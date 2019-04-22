@@ -9,10 +9,10 @@ namespace SpeldesignBotCore.Modules.Giveaways
         public GiveawayItemType ItemTypes;
         public List<GiveawayItem> Items;
 
-        public GiveawayItems(GiveawayItem[] items, GiveawayItemType itemTypes)
+        public GiveawayItems(GiveawayItemType itemTypes, GiveawayItem[] items)
         {
-            Items = items.ToList();
             ItemTypes = itemTypes;
+            Items = items.ToList();
         }
     }
 }

@@ -5,7 +5,8 @@
     {
         public ulong OwnerDiscordId;
         public string ItemName;
-        public string SteamPageLink;
-        // TODO: Add website link, trailer link etc and then add everything that is not null in the giveawaycommand
+        public string PreviewLink;
+        public string InfoToWinner;
+        // Short description?
     }
 }
