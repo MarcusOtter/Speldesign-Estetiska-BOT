@@ -4,10 +4,10 @@ skip_tags: true
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
-  version: '2.1.0'
-  package_version: '2.1.0'
+  version: '{version}'
+  package_version: '{version}'
 install:
-  - dotnet restore
+    - sh: sudo apt-get install dotnet-sdk-2.1 -y
   - dotnet --version
 build_script:
   - dotnet build -c Release
