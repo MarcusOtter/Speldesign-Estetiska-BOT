@@ -22,6 +22,7 @@ test_script:
 
     codecov -f "opencoverCoverage.xml"
     
+    # Needed to make the CI Build fail, because OpenCover doesn't seem to fail the build even if the unit tests fail
     dotnet test SpeldesignBotCore.xUnit.Tests/SpeldesignBotCore.xUnit.Tests.csproj
 on_success:
   - ps: Invoke-RestMethod https://raw.githubusercontent.com/DiscordHooks/appveyor-discord-webhook/master/send.ps1 -o send.ps1
