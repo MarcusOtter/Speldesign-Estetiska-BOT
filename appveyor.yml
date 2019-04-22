@@ -7,7 +7,7 @@ dotnet_csproj:
   version: '{version}'
   package_version: '{version}'
 install:
-    - sh: sudo apt-get install dotnet-sdk-2.1 -y
+  - sh: sudo apt-get install dotnet-sdk-2.1 -y
   - dotnet --version
 build_script:
   - dotnet build -c Release
