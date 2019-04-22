@@ -106,12 +106,14 @@ namespace SpeldesignBotCore
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Unity.Resolve<StatusLogger>().LogToConsole($"[EXCEPTION] Could not change nickname of user: {e.Message}");
             }
         }
 
         private async Task SendRegistrationErrorMessage(SocketCommandContext context, string exceptionMessage)
         {
+            Unity.Resolve<StatusLogger>().LogToConsole($"Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
+
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append(":warning: Whoops! :warning:\n");
             stringBuilder.Append($"It looks like you ({context.User.Mention}) did not follow the registration template correctly.\n");
@@ -119,7 +121,6 @@ namespace SpeldesignBotCore
             stringBuilder.Append("\nIf you believe that this is an error, send a message to `CalmEyE#8246 (Alexander Eriksson)` or `LeMorrow#8192 (Marcus Otterström).`");
 
             await context.Channel.SendMessageAsync(stringBuilder.ToString());
-            Console.WriteLine($"Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
         }
     }
 }
