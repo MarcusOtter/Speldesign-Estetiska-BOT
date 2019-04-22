@@ -9,7 +9,6 @@ dotnet_csproj:
 install:
   - dotnet --version
 before_build:
-  - nuget restore
   - choco install codecov
 build_script:
   - dotnet build -c Release
