@@ -8,12 +8,15 @@ namespace SpeldesignBotCore.Loggers
     {
         public Task LogToConsole(LogMessage message)
         {
-            Console.WriteLine($"{DateTime.Now}: {message.Message}");
+            LogToConsole(message.Message);
             return Task.CompletedTask;
         }
 
         public void LogToConsole(string message)
         {
+            if (message is null) { throw new ArgumentNullException("Can not log null"); }
+            if (string.IsNullOrWhiteSpace(message)) { throw new ArgumentException("Can not log empty message"); }
+
             Console.WriteLine($"{DateTime.Now}: {message}");
         }
     }
