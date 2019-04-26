@@ -4,9 +4,16 @@
     {
         public static string UppercaseFirstChar(this string input)
         {
-            return string.IsNullOrEmpty(input) 
-                ? string.Empty 
-                : $"{char.ToUpperInvariant(input[0])}{input.Substring(1)}";
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                throw new System.ArgumentNullException("Can not uppercase a string without characters");
+            }
+            else if (input[0] == ' ')
+            {
+                throw new System.ArgumentException("The first character cannot be whitespace");
+            }
+
+            return $"{char.ToUpperInvariant(input[0])}{input.Substring(1)}";
         }
     }
 }
