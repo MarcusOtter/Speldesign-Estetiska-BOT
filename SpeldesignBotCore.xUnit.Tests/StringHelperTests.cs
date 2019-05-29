@@ -99,5 +99,17 @@ namespace SpeldesignBotCore.xUnit.Tests
 
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void StringHelper_FindClosestMatch_CorrectMatchTest3()
+        {
+            string[] possibleOutputs = new string[] { "one string" };
+            const string input = "anything";
+            string[] expected = new string[] { "one string" };
+
+            var actual = possibleOutputs.FindClosestMatch(input);
+
+            Assert.Equal(expected, actual);
+        }
     }
 }

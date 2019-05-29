@@ -49,12 +49,10 @@ namespace SpeldesignBotCore.Helpers
                     continue;
                 }
 
-                if (levenshteinDistance < lowestDistance)
-                {
-                    closestMatches.Clear();
-                    lowestDistance = levenshteinDistance;
-                    closestMatches.Add(allOutputStrings[i]);
-                }
+                // The distance was lower than before, so set a new lowestDistance
+                closestMatches.Clear();
+                lowestDistance = levenshteinDistance;
+                closestMatches.Add(allOutputStrings[i]);
             }
 
             return closestMatches.ToArray();
