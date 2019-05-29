@@ -1,5 +1,6 @@
 using Xunit;
 using SpeldesignBotCore.Helpers;
+using System.Collections.Generic;
 
 namespace SpeldesignBotCore.xUnit.Tests
 {
@@ -33,58 +34,59 @@ namespace SpeldesignBotCore.xUnit.Tests
         }
 
         [Fact]
-        public void StringHelper_FindClosestMatchTo_EmptyArrayTest()
+        public void StringHelper_FindClosestMatch_EmptyArrayTest()
         {
             string[] emptyArray = new string[0];
-            Assert.Throws<System.ArgumentException>(() => emptyArray.FindClosestMatchTo("any input"));
+            Assert.Throws<System.ArgumentException>(() => emptyArray.FindClosestMatch("any input"));
         }
 
         [Fact]
-        public void StringHelper_GetLevenstheinDistanceTo_CorrectDistanceTest1()
+        public void StringHelper_LevenshteinDistance_CorrectDistanceTest1()
         {
             const string inputA = "912345";
             const string inputB = "1234";
 
             const int expected = 2;
-            var actual = inputA.GetLevenstheinDistanceTo(inputB);
+            var actual = inputA.LevenshteinDistance(inputB);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void StringHelper_GetLevenstheinDistanceTo_CorrectDistanceTest2()
+        public void StringHelper_LevenshteinDistance_CorrectDistanceTest2()
         {
             const string inputA = "abcdef";
             const string inputB = "azced";
 
             const int expected = 3;
-            var actual = inputA.GetLevenstheinDistanceTo(inputB);
+            var actual = inputA.LevenshteinDistance(inputB);
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void StringHelper_FindClosestMatchTo_CorrectMatchTest1()
+        public void StringHelper_FindClosestMatch_CorrectMatchTest1()
         {
             string[] possibleOutputs = new string[]
             {
-                "Hello world",
                 "Hello",
                 "world",
+                "Hello world",
                 "1234"
             };
 
             const string input = "912345";
             string[] expected = new string[] { "1234" };
 
-            var actual = possibleOutputs.FindClosestMatchTo(input);
+            var actual = possibleOutputs.FindClosestMatch(input);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void StringHelper_FindClosestMatchTo_CorrectMatchTest2()
+        public void StringHelper_FindClosestMatch_CorrectMatchTest2()
         {
-            string[] possibleOutputs = new string[]
+            // now list instead of array
+            List<string> possibleOutputs = new List<string>()
             {
                 "Samuel Svensson",
                 "Samuel Lundberg",
@@ -93,7 +95,19 @@ namespace SpeldesignBotCore.xUnit.Tests
 
             const string input = "Sameull lndbreg";
             string[] expected = new string[] { "Samuel Lundberg" };
-            var actual = expected.FindClosestMatchTo(input);
+            var actual = possibleOutputs.FindClosestMatch(input);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void StringHelper_FindClosestMatch_CorrectMatchTest3()
+        {
+            string[] possibleOutputs = new string[] { "one string" };
+            const string input = "anything";
+            string[] expected = new string[] { "one string" };
+
+            var actual = possibleOutputs.FindClosestMatch(input);
 
             Assert.Equal(expected, actual);
         }

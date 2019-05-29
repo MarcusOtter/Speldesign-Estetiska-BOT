@@ -20,14 +20,14 @@ namespace SpeldesignBotCore.Helpers
         }
 
         /// <summary>
-        /// Returns the closest matching string(s) using the levensthein distance method.
+        /// Returns the closest matching string(s) using the levenshtein distance method.
         /// WARNING: This function can take a very long time.
         /// </summary>
         /// <returns>
-        /// The closest matching string(s) using the levensthein distance method.
+        /// The closest matching string(s) using the levenshtein distance method.
         /// If two strings have the same distance to the examined string, both are returned.
         /// </returns>
-        public static string[] FindClosestMatchTo(this string[] allOutputStrings, string inputString)
+        public static string[] FindClosestMatch(this string[] allOutputStrings, string stringToMatch)
         {
             if (allOutputStrings.Length == 0) { throw new ArgumentException("Must have at least one output string"); }
             if (allOutputStrings.Length == 1) { return new string[1] { allOutputStrings[0] }; } // Return the only element if only one exists.
@@ -37,34 +37,35 @@ namespace SpeldesignBotCore.Helpers
 
             for (int i = 0; i < allOutputStrings.Length; i++)
             {
-                int levenstheinDistance = allOutputStrings[i].GetLevenstheinDistanceTo(inputString);
+                int levenshteinDistance = allOutputStrings[i].LevenshteinDistance(stringToMatch);
 
-                if (i == 0) { lowestDistance = levenstheinDistance; } // initialize lowestDistance
+                if (i == 0) { lowestDistance = levenshteinDistance; } // initialize lowestDistance
 
-                if (levenstheinDistance > lowestDistance) { continue; }
+                if (levenshteinDistance > lowestDistance) { continue; }
 
-                if (levenstheinDistance == lowestDistance)
+                if (levenshteinDistance == lowestDistance)
                 {
                     closestMatches.Add(allOutputStrings[i]);
                     continue;
                 }
 
-                if (levenstheinDistance < lowestDistance)
-                {
-                    closestMatches.Clear();
-                    lowestDistance = levenstheinDistance;
-                    closestMatches.Add(allOutputStrings[i]);
-                }
+                // The distance was lower than before, so set a new lowestDistance
+                closestMatches.Clear();
+                lowestDistance = levenshteinDistance;
+                closestMatches.Add(allOutputStrings[i]);
             }
 
             return closestMatches.ToArray();
         }
 
+        public static string[] FindClosestMatch(this List<string> allOutputStrings, string stringToMatch)
+            => allOutputStrings.ToArray().FindClosestMatch(stringToMatch);
+
         /// <summary>
-        /// Calculates the minimum edit distance (leventhein distance) between two strings.
+        /// Calculates the minimum edit distance (levenshtein distance) between two strings.
         /// Time complexity is probably like O(ab), where a and b are the lengths of the inputs.
         /// </summary>
-        public static int GetLevenstheinDistanceTo(this string a, string b)
+        public static int LevenshteinDistance(this string a, string b)
         {
             int[,] distanceTable = new int[a.Length, b.Length];
 
@@ -77,13 +78,13 @@ namespace SpeldesignBotCore.Helpers
                 }
             }
 
-            return GetSubstringLevenstheinDistance(a, a.Length, b, b.Length, distanceTable);
+            return SubstringLevenshteinDistance(a, a.Length, b, b.Length, distanceTable);
         }
 
         /// <summary>
-        /// Returns the levensthein distance between a.Substring(0, aLength) and b.Substring(0, bLength).
+        /// Returns the levenshtein distance between a.Substring(0, aLength) and b.Substring(0, bLength).
         /// </summary>
-        private static int GetSubstringLevenstheinDistance(string a, int aLength, string b, int bLength, int[,] distanceTable)
+        private static int SubstringLevenshteinDistance(string a, int aLength, string b, int bLength, int[,] distanceTable)
         {
             // If the length is <= 0 the substring will be empty, meaning the distance is the length of the other string.
             // e.g, the distance between "" and "hello" == 5 inserts
@@ -102,14 +103,14 @@ namespace SpeldesignBotCore.Helpers
                 // e.g, "abcd9" and "efgh9" will have the same distance as "abcd" and "efgh"
                 if (a[aIndex] == b[bIndex])
                 {
-                    distanceTable[aIndex, bIndex] = GetSubstringLevenstheinDistance(a, aLength - 1, b, bLength - 1, distanceTable);
+                    distanceTable[aIndex, bIndex] = SubstringLevenshteinDistance(a, aLength - 1, b, bLength - 1, distanceTable);
                 }
                 else
                 {
                     // This guy probably explains what's going on here better https://youtu.be/We3YDTzNXEk?t=193
-                    int topLeftCell = GetSubstringLevenstheinDistance(a, aLength - 1, b, bLength - 1, distanceTable);
-                    int leftCell    = GetSubstringLevenstheinDistance(a, aLength - 1, b, bLength,     distanceTable);
-                    int topCell     = GetSubstringLevenstheinDistance(a, aLength,     b, bLength - 1, distanceTable);
+                    int topLeftCell = SubstringLevenshteinDistance(a, aLength - 1, b, bLength - 1, distanceTable);
+                    int leftCell    = SubstringLevenshteinDistance(a, aLength - 1, b, bLength,     distanceTable);
+                    int topCell     = SubstringLevenshteinDistance(a, aLength,     b, bLength - 1, distanceTable);
 
                     // Set the distance to the smallest one of these and add 1
                     distanceTable[aIndex, bIndex] = Math.Min(topLeftCell, Math.Min(leftCell, topCell)) + 1;
