@@ -49,7 +49,7 @@ namespace SpeldesignBotCore.Helpers
                     continue;
                 }
 
-                // The distance was lower than before, so set a new lowestDistance
+                // The distance was lower than before, so clear the old and set a new lowestDistance
                 closestMatches.Clear();
                 lowestDistance = levenshteinDistance;
                 closestMatches.Add(allOutputStrings[i]);
