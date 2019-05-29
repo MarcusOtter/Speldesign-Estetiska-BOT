@@ -27,7 +27,7 @@ namespace SpeldesignBotCore.Helpers
         /// The closest matching string(s) using the levenshtein distance method.
         /// If two strings have the same distance to the examined string, both are returned.
         /// </returns>
-        public static string[] FindClosestMatchTo(this string[] allOutputStrings, string inputString)
+        public static string[] FindClosestMatch(this string[] allOutputStrings, string stringToMatch)
         {
             if (allOutputStrings.Length == 0) { throw new ArgumentException("Must have at least one output string"); }
             if (allOutputStrings.Length == 1) { return new string[1] { allOutputStrings[0] }; } // Return the only element if only one exists.
@@ -37,7 +37,7 @@ namespace SpeldesignBotCore.Helpers
 
             for (int i = 0; i < allOutputStrings.Length; i++)
             {
-                int levenshteinDistance = allOutputStrings[i].GetLevenshteinDistanceTo(inputString);
+                int levenshteinDistance = allOutputStrings[i].LevenshteinDistance(stringToMatch);
 
                 if (i == 0) { lowestDistance = levenshteinDistance; } // initialize lowestDistance
 
@@ -64,7 +64,7 @@ namespace SpeldesignBotCore.Helpers
         /// Calculates the minimum edit distance (levenshtein distance) between two strings.
         /// Time complexity is probably like O(ab), where a and b are the lengths of the inputs.
         /// </summary>
-        public static int GetLevenshteinDistanceTo(this string a, string b)
+        public static int LevenshteinDistance(this string a, string b)
         {
             int[,] distanceTable = new int[a.Length, b.Length];
 
@@ -77,13 +77,13 @@ namespace SpeldesignBotCore.Helpers
                 }
             }
 
-            return GetSubstringLevenshteinDistance(a, a.Length, b, b.Length, distanceTable);
+            return SubstringLevenshteinDistance(a, a.Length, b, b.Length, distanceTable);
         }
 
         /// <summary>
         /// Returns the levenshtein distance between a.Substring(0, aLength) and b.Substring(0, bLength).
         /// </summary>
-        private static int GetSubstringLevenshteinDistance(string a, int aLength, string b, int bLength, int[,] distanceTable)
+        private static int SubstringLevenshteinDistance(string a, int aLength, string b, int bLength, int[,] distanceTable)
         {
             // If the length is <= 0 the substring will be empty, meaning the distance is the length of the other string.
             // e.g, the distance between "" and "hello" == 5 inserts
@@ -102,14 +102,14 @@ namespace SpeldesignBotCore.Helpers
                 // e.g, "abcd9" and "efgh9" will have the same distance as "abcd" and "efgh"
                 if (a[aIndex] == b[bIndex])
                 {
-                    distanceTable[aIndex, bIndex] = GetSubstringLevenshteinDistance(a, aLength - 1, b, bLength - 1, distanceTable);
+                    distanceTable[aIndex, bIndex] = SubstringLevenshteinDistance(a, aLength - 1, b, bLength - 1, distanceTable);
                 }
                 else
                 {
                     // This guy probably explains what's going on here better https://youtu.be/We3YDTzNXEk?t=193
-                    int topLeftCell = GetSubstringLevenshteinDistance(a, aLength - 1, b, bLength - 1, distanceTable);
-                    int leftCell    = GetSubstringLevenshteinDistance(a, aLength - 1, b, bLength,     distanceTable);
-                    int topCell     = GetSubstringLevenshteinDistance(a, aLength,     b, bLength - 1, distanceTable);
+                    int topLeftCell = SubstringLevenshteinDistance(a, aLength - 1, b, bLength - 1, distanceTable);
+                    int leftCell    = SubstringLevenshteinDistance(a, aLength - 1, b, bLength,     distanceTable);
+                    int topCell     = SubstringLevenshteinDistance(a, aLength,     b, bLength - 1, distanceTable);
 
                     // Set the distance to the smallest one of these and add 1
                     distanceTable[aIndex, bIndex] = Math.Min(topLeftCell, Math.Min(leftCell, topCell)) + 1;
