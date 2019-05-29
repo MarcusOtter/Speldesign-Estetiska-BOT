@@ -6,7 +6,7 @@ namespace SpeldesignBotCore.xUnit.Tests
     public class UnityTests
     {
         [Fact]
-        public void UnityResolveTwoObjectsTest()
+        public void Unity_ResolveTwoObjectsTest()
         {
             var storage1 = Unity.Resolve<IDataStorage>();
             var storage2 = Unity.Resolve<IDataStorage>();
