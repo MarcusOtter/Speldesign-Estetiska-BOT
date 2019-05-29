@@ -16,7 +16,7 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void DataStorage_InMemoryStorage_OverrideTest()
         {
-            const string key = "KEY";
+            const string key = "Config/TestKey";
             const string firstString = "I should be overriden";
             const string expected = "I should override the previous data";
 
@@ -31,10 +31,44 @@ namespace SpeldesignBotCore.xUnit.Tests
         }
 
         [Fact]
-        public void DataStorage_InMemoryStorage_RestoreObject_WrongKeyTest()
+        public void DataStorage_InMemoryStorage_RestoreObject_MissingKeyTest()
         {
             IDataStorage storage = new InMemoryStorage();
             Assert.Throws<System.ArgumentException>(() => storage.RestoreObject<string>("fake-key"));
+        }
+
+        [Fact]
+        public void DataStorage_JsonStorage_RestoreObject_MissingKeyTest()
+        {
+            IDataStorage storage = new JsonStorage();
+            Assert.Throws<System.ArgumentException>(() => storage.RestoreObject<string>("fake-key"));
+        }
+
+        [Fact]
+        public void DataStorage_JsonStorage_StoreObject_InvalidKeyTest()
+        {
+            const string key = "configurationFile";
+            const string objectToStore = "some information";
+
+            IDataStorage storage = new JsonStorage();
+            Assert.Throws<System.ArgumentException>(() => storage.StoreObject(objectToStore, key));
+        }
+
+        [Fact]
+        public void DataStorage_JsonStorage_OverrideTest()
+        {
+            const string key = "Config/TestKey";
+            const string firstString = "I should be overriden";
+            const string expected = "I should override the previous data";
+
+            IDataStorage storage = new JsonStorage();
+
+            storage.StoreObject(firstString, key);
+            storage.StoreObject(expected, key);
+
+            var actual = storage.RestoreObject<string>(key);
+
+            Assert.Equal(expected, actual);
         }
     }
 }
