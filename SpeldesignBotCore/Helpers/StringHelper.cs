@@ -60,6 +60,9 @@ namespace SpeldesignBotCore.Helpers
             return closestMatches.ToArray();
         }
 
+        public static string[] FindClosestMatch(this List<string> allOutputStrings, string stringToMatch)
+            => allOutputStrings.ToArray().FindClosestMatch(stringToMatch);
+
         /// <summary>
         /// Calculates the minimum edit distance (levenshtein distance) between two strings.
         /// Time complexity is probably like O(ab), where a and b are the lengths of the inputs.

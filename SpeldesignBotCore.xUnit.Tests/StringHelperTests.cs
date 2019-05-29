@@ -1,5 +1,6 @@
 using Xunit;
 using SpeldesignBotCore.Helpers;
+using System.Collections.Generic;
 
 namespace SpeldesignBotCore.xUnit.Tests
 {
@@ -67,9 +68,9 @@ namespace SpeldesignBotCore.xUnit.Tests
         {
             string[] possibleOutputs = new string[]
             {
-                "Hello world",
                 "Hello",
                 "world",
+                "Hello world",
                 "1234"
             };
 
@@ -84,7 +85,8 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void StringHelper_FindClosestMatch_CorrectMatchTest2()
         {
-            string[] possibleOutputs = new string[]
+            // now list instead of array
+            List<string> possibleOutputs = new List<string>()
             {
                 "Samuel Svensson",
                 "Samuel Lundberg",
@@ -93,7 +95,7 @@ namespace SpeldesignBotCore.xUnit.Tests
 
             const string input = "Sameull lndbreg";
             string[] expected = new string[] { "Samuel Lundberg" };
-            var actual = expected.FindClosestMatch(input);
+            var actual = possibleOutputs.FindClosestMatch(input);
 
             Assert.Equal(expected, actual);
         }
