@@ -3,4 +3,4 @@
 [![codecov](https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT/branch/master/graph/badge.svg)](https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT)
 
 
-A simple discord bot specifically made for a private discord server.
+Discord bot made for a school discord server.
