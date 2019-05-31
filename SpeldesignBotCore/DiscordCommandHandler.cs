@@ -12,8 +12,6 @@ namespace SpeldesignBotCore
         private readonly CommandService _commandService;
         private readonly string _prefix;
 
-        private IUser _botUser;
-
         public DiscordCommandHandler(CommandService commandService, BotConfiguration botConfiguration)
         {
             _commandService = commandService;
@@ -26,17 +24,12 @@ namespace SpeldesignBotCore
             Unity.Resolve<Loggers.StatusLogger>().LogToConsole("Installed command modules");
         }
 
-        public void SetBotUser(IUser botUser)
-        {
-            _botUser = botUser;
-        }
-
         public async Task HandleCommand(SocketUserMessage message, SocketCommandContext context)
         {
             int argPos = 0;
 
             // If the message doesn't start with a prefix nor a mention of this bot
-            if (!(message.HasStringPrefix(_prefix, ref argPos) || message.HasMentionPrefix(_botUser, ref argPos)))
+            if (!(message.HasStringPrefix(_prefix, ref argPos) || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos)))
             {
                 return;
             }
