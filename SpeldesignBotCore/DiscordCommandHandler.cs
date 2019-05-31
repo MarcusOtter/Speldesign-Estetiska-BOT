@@ -17,7 +17,6 @@ namespace SpeldesignBotCore
         public DiscordCommandHandler(CommandService commandService, BotConfiguration botConfiguration)
         {
             _commandService = commandService;
-
             _prefix = botConfiguration.Prefix;
         }
 
