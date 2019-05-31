@@ -2,6 +2,8 @@
 
 namespace SpeldesignBotCore
 {
+    // WARNING: This attribute is currently not being used and will be removed soon.
+
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class CommandInfoAttribute : Attribute
     {
