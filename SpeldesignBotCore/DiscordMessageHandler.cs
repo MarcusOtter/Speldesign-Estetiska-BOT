@@ -33,6 +33,14 @@ namespace SpeldesignBotCore
             if (context.User.IsBot) { return; }
             if (msg is null) { return; }
 
+            // If this is a DM, no logging or registration should happen,
+            // so just handle command and return.
+            if (context.IsPrivate)
+            {
+                await _commandHandler.HandleCommand(msg, context);
+                return;
+            }
+
             await _messageLogger.LogToLoggingChannel(msg);
 
             if (context.Channel.Id == _botConfig.RegistrationChannelId)
@@ -43,7 +51,7 @@ namespace SpeldesignBotCore
 
             await _commandHandler.HandleCommand(msg, context);
         }
-        
+
         private async Task TryRegisterNewUser(SocketCommandContext context)
         {
             string msg = context.Message.Content;

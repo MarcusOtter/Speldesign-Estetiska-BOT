@@ -11,6 +11,7 @@ namespace SpeldesignBotCore.Modules.Giveaways
     public class GiveawayCommands : ModuleBase<SocketCommandContext>
     {
         [Command("draw")]
+        [CommandInfo("draw [amount] [item type]", "Draws an amount of givaway items.")]
         [RequireUserPermission(GuildPermission.BanMembers)]
         public async Task GiveawayDraw(int amount, [Remainder] string args)
         {
