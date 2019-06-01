@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using SpeldesignBotCore.Entities;
@@ -61,7 +61,7 @@ namespace SpeldesignBotCore
 
             if (splitMsg.Length < 3)
             {
-                await SendRegistrationErrorMessage(context, "Too little information provided. Please follow the template:\n@SPE-- Firstname Lastname");
+                await SendRegistrationErrorMessage(context, "I need more information than that.");
                 return;
             }
 
@@ -82,7 +82,7 @@ namespace SpeldesignBotCore
             }
             catch
             {
-                await SendRegistrationErrorMessage(context, $"Your first word, '{splitMsg[0]}', is not a valid class role.\nMake sure to write '@' and then your class name. (3 capital letters followed by 2 numbers. Example: @SPE16)");
+                await SendRegistrationErrorMessage(context, $"\"{splitMsg[0]}\" is not a valid class role.");
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace SpeldesignBotCore
 
             if (!validRoleIds.Contains(roleToAdd.Id))
             {
-                await SendRegistrationErrorMessage(context, $"@{roleToAdd.Name} is not a valid class role.\nValid class role example: @SPE16");
+                await SendRegistrationErrorMessage(context, $"\"@{roleToAdd.Name}\" is not a valid class role.");
                 return;
             }
 
@@ -122,13 +122,13 @@ namespace SpeldesignBotCore
         {
             Unity.Resolve<StatusLogger>().LogToConsole($"Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
 
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.Append(":warning: Whoops! :warning:\n");
-            stringBuilder.Append($"It looks like you ({context.User.Mention}) did not follow the registration template correctly.\n");
-            stringBuilder.Append($"\nError message:\n```fix\n{exceptionMessage}```");
-            stringBuilder.Append("\nIf you believe that this is an error, send a message to `CalmEyE#8246 (Alexander Eriksson)` or `LeMorrow#8192 (Marcus Otterström).`");
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle(exceptionMessage)
+                .WithDescription("Follow the template:\n**@SPE-- Firstname Lastname**")
+                .WithColor(255, 79, 79)
+                .WithFooter("Think this an error? Send a message to @CalmEyE#8246 or @LeMorrow#8192");
 
-            await context.Channel.SendMessageAsync(stringBuilder.ToString());
+            await context.Channel.SendMessageAsync("", embed: embedBuilder.Build());
         }
     }
 }
