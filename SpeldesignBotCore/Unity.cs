@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using SpeldesignBotCore.Entities;
 using SpeldesignBotCore.Loggers;
 using SpeldesignBotCore.Modules.Giveaways;
+using SpeldesignBotCore.Registration;
 using SpeldesignBotCore.Storage;
 using SpeldesignBotCore.Storage.Implementations;
 using Unity;
@@ -40,6 +41,7 @@ namespace SpeldesignBotCore
             _container.RegisterSingleton<DiscordCommandHandler>();
             _container.RegisterSingleton<DiscordMessageLogger>();
 
+            _container.RegisterSingleton<RegistrationHandler>();
             _container.RegisterSingleton<GiveawayRepo>();
 
             _container.RegisterSingleton<Connection>();
