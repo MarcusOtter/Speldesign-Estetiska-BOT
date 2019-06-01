@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using SpeldesignBotCore.Entities;
 using SpeldesignBotCore.Loggers;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,13 @@ namespace SpeldesignBotCore.Registration
 {
     public class RegistrationHandler
     {
+        private readonly BotConfiguration _botConfiguration;
+
+        public RegistrationHandler()
+        {
+            _botConfiguration = Unity.Resolve<BotConfiguration>();
+        }
+
         public async Task TryRegisterNewUser(SocketCommandContext context)
         {
             string msg = context.Message.Content;
@@ -34,10 +42,7 @@ namespace SpeldesignBotCore.Registration
 
                 roleToAdd = context.Guild.GetRole(requestedRoleId);
 
-                if (roleToAdd == null)
-                {
-                    throw new Exception();
-                }
+                if (roleToAdd == null) { throw new Exception(); }
             }
             catch
             {
@@ -45,16 +50,7 @@ namespace SpeldesignBotCore.Registration
                 return;
             }
 
-            // TODO: Get this list from a json
-            ulong[] validRoleIds =
-            {
-                458191879884898325,
-                458192131874488330,
-                458192128980549633,
-                489738222054670336
-            };
-
-            if (!validRoleIds.Contains(roleToAdd.Id))
+            if (!_botConfiguration.SchoolClassesRoleIds.Contains(roleToAdd.Id))
             {
                 await SendRegistrationErrorMessage(context, $"\"@{roleToAdd.Name}\" is not a valid class role.");
                 return;

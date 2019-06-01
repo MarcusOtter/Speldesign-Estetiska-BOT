@@ -1,4 +1,5 @@
 ﻿using SpeldesignBotCore.Storage;
+using System.Collections.Generic;
 
 namespace SpeldesignBotCore.Entities
 {
@@ -10,6 +11,7 @@ namespace SpeldesignBotCore.Entities
         public string Prefix;
         public ulong LoggingChannelId;
         public ulong RegistrationChannelId;
+        public List<ulong> SchoolClassesRoleIds;
 
         private readonly IDataStorage _dataStorage;
 
@@ -29,6 +31,7 @@ namespace SpeldesignBotCore.Entities
             Prefix = botConfig.Prefix;
             LoggingChannelId = botConfig.LoggingChannelId;
             RegistrationChannelId = botConfig.RegistrationChannelId;
+            SchoolClassesRoleIds = botConfig.SchoolClassesRoleIds;
         }
 
         public void Save()
