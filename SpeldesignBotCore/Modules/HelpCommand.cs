@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using SpeldesignBotCore.Entities;
 using System.Threading.Tasks;
 
 namespace SpeldesignBotCore.Modules
@@ -7,10 +8,12 @@ namespace SpeldesignBotCore.Modules
     public class HelpCommand : ModuleBase<SocketCommandContext>
     {
         private readonly CommandService _commandService;
+        private readonly BotConfiguration _botConfiguration;
 
-        public HelpCommand(CommandService commandService)
+        public HelpCommand()
         {
-            _commandService = commandService;
+            _commandService = Unity.Resolve<CommandService>();
+            _botConfiguration = Unity.Resolve<BotConfiguration>();
         }
 
         [Command("help")]
@@ -57,7 +60,9 @@ namespace SpeldesignBotCore.Modules
 
             foreach(var command in _commandService.Commands)
             {
-                embedBuilder.AddField(command.Remarks ?? command.Name, command.Summary ?? "No description available.");
+                embedBuilder.AddField(
+                    $"{_botConfiguration.Prefix}{command.Remarks ?? command.Name}",
+                    command.Summary ?? "No description available.");
             }
 
             return embedBuilder;

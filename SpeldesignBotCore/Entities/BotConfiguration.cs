@@ -2,12 +2,16 @@
 
 namespace SpeldesignBotCore.Entities
 {
+    // This whole class is pretty sketchy, needs to be refactored and reorganized
     public class BotConfiguration
     {
+        // Can't be readonly because then json can't convert to this format, I think.
         public string Token;
         public string Prefix;
         public ulong LoggingChannelId;
         public ulong RegistrationChannelId;
+
+        private readonly IDataStorage _dataStorage;
 
         public BotConfiguration()
         {
@@ -17,16 +21,19 @@ namespace SpeldesignBotCore.Entities
 
         public BotConfiguration(IDataStorage storage)
         {
+            _dataStorage = storage;
+
             var botConfig = storage.RestoreObject<BotConfiguration>("Config/BotConfig");
 
             Token = botConfig.Token;
             Prefix = botConfig.Prefix;
             LoggingChannelId = botConfig.LoggingChannelId;
             RegistrationChannelId = botConfig.RegistrationChannelId;
+        }
 
-            //Token = storage.RestoreObject<string>("Config/BotToken");
-            //LoggingChannelId = storage.RestoreObject<ulong>("Config/LogChannel");
-            //RegistrationChannelId = storage.RestoreObject<ulong>("Config/RegistrationChannel");
+        public void Save()
+        {
+            _dataStorage.StoreObject(this, "Config/BotConfig");
         }
     }
 }
