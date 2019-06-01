@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using SpeldesignBotCore.Entities;
 using System.Threading.Tasks;
 
@@ -36,6 +37,8 @@ namespace SpeldesignBotCore.Modules
 
             _botConfiguration.Prefix = newPrefix;
             _botConfiguration.Save();
+
+            await Context.Client.SetGameAsync($"for {_botConfiguration.Prefix}help", type: ActivityType.Watching);
         }
     }
 }
