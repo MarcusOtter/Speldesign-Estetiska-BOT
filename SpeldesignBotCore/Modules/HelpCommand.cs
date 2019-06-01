@@ -1,9 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using SpeldesignBotCore.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SpeldesignBotCore.Modules
@@ -46,7 +43,7 @@ namespace SpeldesignBotCore.Modules
         }
 
         [Command("help")]
-        [Summary("*In progress.* Provides more information about a command"), Remarks("help [command]")]
+        [Summary("*In progress.* Provides more information about a command."), Remarks("help [command]")]
         public async Task Help([Remainder] string query)
         {
 
@@ -65,7 +62,7 @@ namespace SpeldesignBotCore.Modules
             {
                 embedBuilder.AddField(
                     $"{_botConfiguration.Prefix}{command.Remarks ?? command.Name}",
-                    command.Summary ?? "No description available.", inline: true);
+                    command.Summary ?? "No description available.");
             }
 
             return embedBuilder;
