@@ -26,7 +26,7 @@ namespace SpeldesignBotCore
             await _client.StartAsync();
 
             _client.MessageReceived += _messageHandler.HandleMessageAsync;
-            //await _client.SetGameAsync("cute animals on imgur", type: ActivityType.Watching);
+            await _client.SetGameAsync($"for {config.Prefix}help", type: ActivityType.Watching);
 
             await Task.Delay(-1);
         }
