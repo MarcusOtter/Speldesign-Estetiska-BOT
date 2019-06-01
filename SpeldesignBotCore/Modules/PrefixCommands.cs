@@ -39,7 +39,7 @@ namespace SpeldesignBotCore.Modules
             _botConfiguration.Prefix = newPrefix;
             _botConfiguration.Save();
 
-            await Context.Client.SetGameAsync($"for {_botConfiguration.Prefix}help", type: ActivityType.Watching);
+            await Context.Client.SetGameAsync($"\"{_botConfiguration.Prefix}help\"", type: ActivityType.Listening);
         }
     }
 }

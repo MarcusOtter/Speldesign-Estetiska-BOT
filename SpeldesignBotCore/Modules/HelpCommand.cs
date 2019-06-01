@@ -17,7 +17,7 @@ namespace SpeldesignBotCore.Modules
         }
 
         [Command("help")]
-        [Summary("Shows this command."), Remarks("help")]
+        [Summary("Shows a list of all commands."), Remarks("help")]
         public async Task Help()
         {
             var dmChannel = await Context.User.GetOrCreateDMChannelAsync();
@@ -46,7 +46,7 @@ namespace SpeldesignBotCore.Modules
         [Summary("*In progress.* Provides more information about a command."), Remarks("help [command]")]
         public async Task Help([Remainder] string query)
         {
-
+            // should make sure to remove the prefix if the user included that.
         }
 
         private EmbedBuilder GetHelpMessageEmbed()
@@ -54,7 +54,7 @@ namespace SpeldesignBotCore.Modules
             var embedBuilder = new EmbedBuilder()
             {
                 Title = "__Help__",
-                Description = "Below you can find a list of all the commands.",
+                Description = "Below you can find a list of all the commands. Omit square brackets.",
                 Color = new Color(118, 196, 177)
             };
 
