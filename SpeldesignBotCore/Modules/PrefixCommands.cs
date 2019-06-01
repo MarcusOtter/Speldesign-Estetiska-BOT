@@ -18,9 +18,11 @@ namespace SpeldesignBotCore.Modules
         [Summary("Responds with the current prefix of the bot."), Remarks("prefix")]
         public async Task Prefix()
         {
-            await ReplyAsync($"The command prefix is `{_botConfiguration.Prefix}`\n\nThere are two different ways to invoke a command:" 
-                           + $"\n1. `{_botConfiguration.Prefix}help`"
-                           + $"\n2. {Context.Client.CurrentUser.Mention} help");
+            await ReplyAsync($@"The command prefix is `{_botConfiguration.Prefix}`\n\n
+
+                                There are two different ways to invoke a command:\n
+                                1. `{_botConfiguration.Prefix}help`\n
+                                2. {Context.Client.CurrentUser.Mention} help");
         }
 
         [Command("setprefix")]
