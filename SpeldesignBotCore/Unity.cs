@@ -29,7 +29,7 @@ namespace SpeldesignBotCore
             _container = new UnityContainer();
 
             _container.RegisterSingleton<IDataStorage, JsonStorage>();
-            _container.RegisterSingleton<BotConfiguration>();
+            _container.RegisterSingleton<BotConfiguration>(new InjectionConstructor(typeof(IDataStorage)));
 
             _container.RegisterType<DiscordSocketConfig>(new InjectionFactory(i => SocketConfig.GetDefault())); // Return default config when asking for a DiscordSocketConfig
             _container.RegisterSingleton<DiscordSocketClient>(new InjectionConstructor(typeof(DiscordSocketConfig))); // Make DiscordSocketClient use the constructor with DiscordSocketConfig

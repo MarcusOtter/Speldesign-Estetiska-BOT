@@ -5,7 +5,7 @@ namespace SpeldesignBotCore.Entities
     // This whole class is pretty sketchy, needs to be refactored and reorganized
     public class BotConfiguration
     {
-        // Can't be readonly because then json can't convert to this format, I think.
+        // Can't be readonly because then Newtonsoft JSON can't Deserialize to this object.
         public string Token;
         public string Prefix;
         public ulong LoggingChannelId;
@@ -15,15 +15,15 @@ namespace SpeldesignBotCore.Entities
 
         public BotConfiguration()
         {
-            // Sketchy because this is how Newtonsoft JSON needs to instantiate it,
-            // but Unity might pick this constructor over the other one when doing Unity.Resolve<BotConfiguration>()
+            // This constructor is used for Newtonsoft JSON to deserialize the object.
+            // When resolving with Unity, it's forced to pick the other constructor through InjectionConstructor.
         }
-
+        
         public BotConfiguration(IDataStorage storage)
         {
             _dataStorage = storage;
 
-            var botConfig = storage.RestoreObject<BotConfiguration>("Config/BotConfig");
+            var botConfig = _dataStorage.RestoreObject<BotConfiguration>("Config/BotConfig");
 
             Token = botConfig.Token;
             Prefix = botConfig.Prefix;
