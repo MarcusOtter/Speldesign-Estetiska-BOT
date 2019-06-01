@@ -37,9 +37,25 @@ namespace SpeldesignBotCore
 
             var result = await _commandService.ExecuteAsync(context, argPos);
 
-            if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
+            if (result.IsSuccess) { return; }
+
+            switch (result.Error)
             {
-                Unity.Resolve<Loggers.StatusLogger>().LogToConsole(result.ErrorReason);
+                case CommandError.UnknownCommand:
+                    Unity.Resolve<Loggers.StatusLogger>().LogToConsole(result.ErrorReason);
+                    break;
+
+                default:
+                    Unity.Resolve<Loggers.StatusLogger>().LogToConsole($"[ERROR] {result.ErrorReason}");
+
+                    var embedBuilder = new EmbedBuilder()
+                        .WithTitle("An error occured.")
+                        .WithDescription($"Error reason: __{result.ErrorReason}__")
+                        .WithColor(255, 79, 79)
+                        .WithFooter($"Try {_botConfiguration.Prefix}help {message.Content.Split(' ')[0].Remove(0, _botConfiguration.Prefix.Length)} to get more information");
+
+                    await context.Channel.SendMessageAsync("", embed: embedBuilder.Build());
+                    break;
             }
         }
     }
