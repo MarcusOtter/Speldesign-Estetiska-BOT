@@ -50,7 +50,9 @@ namespace SpeldesignBotCore.Registration
                 return;
             }
 
-            if (!_botConfiguration.SchoolClassesRoleIds.Contains(roleToAdd.Id))
+            // If this role is not a school class role or the alumni role, don't give it to the user.
+            if (!_botConfiguration.SchoolClassesRoleIds.Contains(roleToAdd.Id) && 
+                _botConfiguration.AlumniRoleId != roleToAdd.Id)
             {
                 await SendRegistrationErrorMessage(context, $"\"@{roleToAdd.Name}\" is not a valid class role.");
                 return;
@@ -69,6 +71,7 @@ namespace SpeldesignBotCore.Registration
             }
             catch (Exception e)
             {
+                // This usually means that the user is higher in the hierarchy than the bot.
                 Unity.Resolve<StatusLogger>().LogToConsole($"[EXCEPTION] Could not change nickname of user: {e.Message}");
             }
         }
