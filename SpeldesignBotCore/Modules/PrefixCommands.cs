@@ -25,6 +25,7 @@ namespace SpeldesignBotCore.Modules
 
         [Command("setprefix")]
         [Summary("Sets the prefix of the bot."), Remarks("setprefix [prefix]")]
+        [RequireUserPermission(GuildPermission.BanMembers)]
         public async Task SetPrefix([Remainder] string newPrefix)
         {
             if (newPrefix.Contains(" "))
