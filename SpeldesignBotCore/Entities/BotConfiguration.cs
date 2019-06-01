@@ -1,5 +1,6 @@
 ﻿using SpeldesignBotCore.Storage;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpeldesignBotCore.Entities
 {
@@ -11,8 +12,9 @@ namespace SpeldesignBotCore.Entities
         public ulong LoggingChannelId;
         public ulong RegistrationChannelId;
         public ulong AlumniRoleId;
-        public List<ulong> SchoolClassesRoleIds;
+        public List<SchoolClass> SchoolClasses;
 
+        public List<ulong> SchoolClassesRoleIds => SchoolClasses.Select(x => x.RoleId).ToList();
         private readonly IDataStorage _dataStorage;
 
         public BotConfiguration()
@@ -32,7 +34,7 @@ namespace SpeldesignBotCore.Entities
             LoggingChannelId = botConfig.LoggingChannelId;
             RegistrationChannelId = botConfig.RegistrationChannelId;
             AlumniRoleId = botConfig.AlumniRoleId;
-            SchoolClassesRoleIds = botConfig.SchoolClassesRoleIds;
+            SchoolClasses = botConfig.SchoolClasses;
         }
 
         public void Save()
