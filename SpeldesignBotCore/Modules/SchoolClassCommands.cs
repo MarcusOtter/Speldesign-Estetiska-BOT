@@ -16,7 +16,7 @@ namespace SpeldesignBotCore.Modules
         }
 
         [Command("addclass")]
-        [Summary("Adds a new class to the list of school classes."), Remarks("addclass [@classrole] [comma separated names]")]
+        [Summary("Adds a new class to the list of school classes."), Remarks("addclass [@class] [comma separated names]")]
         [RequireUserPermission(GuildPermission.BanMembers)]
         public async Task AddSchoolClass(IRole classRole, [Remainder] string names)
         {
@@ -48,7 +48,7 @@ namespace SpeldesignBotCore.Modules
         }
 
         [Command("removeclass")]
-        [Summary("Permanently removes an existing class from the list of school classes."), Remarks("removeclass [@classrole]")]
+        [Summary("Permanently removes an existing class from the list of school classes."), Remarks("removeclass [@class]")]
         [RequireUserPermission(GuildPermission.BanMembers)]
         public async Task RemoveSchoolClass(IRole classRole)
         {
@@ -96,6 +96,69 @@ namespace SpeldesignBotCore.Modules
             }
 
             await ReplyAsync("", embed: embedBuilder.Build());
+        }
+
+        [Command("remainingStudents")]
+        [Summary("Lists the students that haven't joined from a class"), Remarks("remainingStudents [@class]")]
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        public async Task RemainingStudents(IRole classRole)
+        {
+            if (!_botConfiguration.SchoolClassesRoleIds.Contains(classRole.Id))
+            {
+                await ReplyAsync("That class does not exist.");
+                return;
+            }
+
+            // Get the names of all the students in the class
+            var allNames = _botConfiguration.SchoolClasses
+                .First(x => x.RoleId == classRole.Id)
+                .StudentNames;
+
+            // Get the names of all the students in this class on the server
+            var studentsInServer = Context.Guild.Users
+                .Where(x => x.Roles.Contains(classRole))
+                .Select(x => x.Nickname)
+                .ToArray();
+            
+            // Find the names that are not in the server
+            var remainingStudents = allNames
+                .Where(x => !studentsInServer.Contains(x))
+                .ToArray();
+
+            if (!remainingStudents.Any())
+            {
+                await ReplyAsync($"There are no remaining students from {classRole.Name}!");
+                return;
+            }
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle($"Students remaining from {classRole.Name}")
+                .WithDescription(string.Join(", ", remainingStudents))
+                .WithColor(118, 196, 177);
+
+            var dmChannel = await Context.User.GetOrCreateDMChannelAsync();
+
+            try
+            {
+                await dmChannel.SendMessageAsync("", embed: embedBuilder.Build());
+            }
+            // If the user does not allow direct messages from this server, deny access
+            catch (Discord.Net.HttpException)
+            {
+                await ReplyAsync(
+                    "You need to allow DMs from this server so the names can be sent to you in private.\n\n" +
+                    "To enable:\n" +
+                    $"Click the `{Context.Guild.Name}` dropdown (top left corner)\n" +
+                    "Click `Privacy Settings`\n" +
+                    "Enable `Allow direct messages from server members`\n");
+
+                return;
+            }
+
+            if (!Context.IsPrivate)
+            {
+                await ReplyAsync("Sent a list of the names to your DMs");
+            }
         }
     }
 }
