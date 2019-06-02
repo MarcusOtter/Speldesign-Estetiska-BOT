@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace SpeldesignBotCore.Modules
 {
-    public class BotConfigurationCommand : ModuleBase<SocketCommandContext>
+    public class SchoolClassCommands : ModuleBase<SocketCommandContext>
     {
         private readonly BotConfiguration _botConfiguration;
 
-        public BotConfigurationCommand()
+        public SchoolClassCommands()
         {
             _botConfiguration = Unity.Resolve<BotConfiguration>();
         }
