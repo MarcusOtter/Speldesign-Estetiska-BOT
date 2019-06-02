@@ -47,6 +47,32 @@ namespace SpeldesignBotCore.Modules
             await ReplyAsync("", embed: embedBuilder.Build());
         }
 
+        [Command("removeclass")]
+        [Summary("Permanently removes an existing class from the list of school classes."), Remarks("removeclass [@classrole]")]
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        public async Task RemoveSchoolClass(IRole classRole)
+        {
+            if (!_botConfiguration.SchoolClassesRoleIds.Contains(classRole.Id))
+            {
+                await ReplyAsync("That class does not exist.");
+                return;
+            }
+
+            var classToRemove = _botConfiguration.SchoolClasses.FirstOrDefault(x => x.RoleId == classRole.Id);
+            _botConfiguration.SchoolClasses.Remove(classToRemove);
+            _botConfiguration.Save();
+
+            // Would be very nice with a confirmation here. Make sure they didn't mean to graduate the class.
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle("Success!")
+                .WithDescription($"Removed class {classRole.Mention}.")
+                .WithColor(118, 196, 177)
+                .WithFooter($"{_botConfiguration.Prefix}classes to see all remaining classes.");
+
+            await ReplyAsync("", embed: embedBuilder.Build());
+        }
+
         [Command("classes")]
         [Summary("Lists all the classes."), Remarks("classes")]
         public async Task ListClasses()
