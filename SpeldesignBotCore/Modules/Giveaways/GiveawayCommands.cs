@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using SpeldesignBotCore.Helpers;
 
 namespace SpeldesignBotCore.Modules.Giveaways
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SpeldesignBotCore.Helpers
+namespace SpeldesignBotCore
 {
     public static class StringHelper
     {
@@ -27,10 +27,9 @@ namespace SpeldesignBotCore.Helpers
         /// The closest matching string(s) using the levenshtein distance method.
         /// If two strings have the same distance to the examined string, both are returned.
         /// </returns>
-        public static string[] FindClosestMatch(this string[] allOutputStrings, string stringToMatch)
+        public static string[] FindClosestMatch(this string[] allOutputStrings, string stringToMatch, int maxDistance = -1)
         {
             if (allOutputStrings.Length == 0) { throw new ArgumentException("Must have at least one output string"); }
-            if (allOutputStrings.Length == 1) { return new string[1] { allOutputStrings[0] }; } // Return the only element if only one exists.
 
             List<string> closestMatches = new List<string>();
             int lowestDistance = 100;
@@ -41,8 +40,13 @@ namespace SpeldesignBotCore.Helpers
 
                 if (i == 0) { lowestDistance = levenshteinDistance; } // initialize lowestDistance
 
+                // If there has been a better result, move to the next string
                 if (levenshteinDistance > lowestDistance) { continue; }
 
+                // If maxDistance has been set and the result is worse than allowed, move to the next string
+                if (maxDistance != -1 && levenshteinDistance > maxDistance) { continue; }
+
+                // If the lowest result is equal to this result, add this string as another closest match and move to the next string
                 if (levenshteinDistance == lowestDistance)
                 {
                     closestMatches.Add(allOutputStrings[i]);

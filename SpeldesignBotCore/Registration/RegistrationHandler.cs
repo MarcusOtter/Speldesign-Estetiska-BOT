@@ -13,10 +13,13 @@ namespace SpeldesignBotCore.Registration
     public class RegistrationHandler
     {
         private readonly BotConfiguration _botConfiguration;
+        private readonly StatusLogger _statusLogger;
+
 
         public RegistrationHandler()
         {
             _botConfiguration = Unity.Resolve<BotConfiguration>();
+            _statusLogger = Unity.Resolve<StatusLogger>();
         }
 
         public async Task TryRegisterNewUser(SocketCommandContext context)
@@ -58,34 +61,80 @@ namespace SpeldesignBotCore.Registration
                 return;
             }
 
-            await socketUser.AddRoleAsync(roleToAdd);
-
+            // Remove the role mention from the string
             List<string> names = splitMsg.ToList();
             names.RemoveAt(0);
 
             string fullName = string.Join(' ', names);
 
+            string[] namesInClass = _botConfiguration.SchoolClasses
+                                        .Where(x => x.RoleId == roleToAdd.Id)
+                                        .FirstOrDefault()
+                                        .StudentNames.ToArray();
+
+            // If the name doesn't exist in this class, check for close matches in the class
+            if (!namesInClass.Contains(fullName))
+            {
+                string[] closeMatches = namesInClass.FindClosestMatch(fullName, maxDistance: 5);
+
+                if (closeMatches.Length == 0)
+                {
+                    await SendRegistrationErrorMessage(context, $"Could not find that name in {roleToAdd.Name}");
+                }
+                else
+                {
+                    await SendCloseMatchMessage(context, closeMatches);
+                }
+
+                return;
+            }
+
             try
             {
+                await socketUser.AddRoleAsync(roleToAdd);
                 await socketUser.ModifyAsync(user => user.Nickname = fullName);
             }
             catch (Exception e)
             {
                 // This usually means that the user is higher in the hierarchy than the bot.
-                Unity.Resolve<StatusLogger>().LogToConsole($"[EXCEPTION] Could not change nickname of user: {e.Message}");
+                _statusLogger.LogToConsole($"[EXCEPTION] Could not modify user: {e.Message}");
+                return;
             }
+
+            _statusLogger.LogToConsole($"Successful registration by {context.User.Username}.");
+        }
+
+        private async Task SendCloseMatchMessage(SocketCommandContext context, string[] closeMatches)
+        {
+            // Filter out users that have already joined the guild
+            closeMatches = closeMatches.Where(x => !context.Guild.Users.Any(y => y.Nickname == x)).ToArray();
+            if (closeMatches.Length == 0)
+            {
+                await SendRegistrationErrorMessage(context, "That user has already joined.");
+                return;
+            }
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle("Could not find that name.")
+                .WithColor(255, 79, 79)
+                .WithFooter("Think this an error? Send a message to @CalmEyE#8246 or @LeMorrow#8192")
+                .WithDescription(closeMatches.Length == 1
+                    ? $"Did you mean `{closeMatches[0]}`?"
+                    : $"Did you mean one of these?\n`{string.Join("`\n`", closeMatches)}`");
+
+            _statusLogger.LogToConsole($"Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
+            await context.Channel.SendMessageAsync("", embed: embedBuilder.Build());
         }
 
         private async Task SendRegistrationErrorMessage(SocketCommandContext context, string exceptionMessage)
         {
-            Unity.Resolve<StatusLogger>().LogToConsole($"Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
-
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(exceptionMessage)
-                .WithDescription("Follow the template:\n**@SPE-- Firstname Lastname**")
+                .WithDescription("Make sure you're following the template and spelling your name correctly.\n**@SPE-- Firstname Lastname**")
                 .WithColor(255, 79, 79)
                 .WithFooter("Think this an error? Send a message to @CalmEyE#8246 or @LeMorrow#8192");
 
+            _statusLogger.LogToConsole($"Unsuccessful registration by {context.User.Username}. Message: '{context.Message}'");
             await context.Channel.SendMessageAsync("", embed: embedBuilder.Build());
         }
     }
