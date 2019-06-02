@@ -44,11 +44,12 @@ namespace SpeldesignBotCore.Modules
 
         [Command("help")]
         [Summary("*In progress.* Provides more information about a command."), Remarks("help [command]")]
-        public async Task Help([Remainder] string query)
+        public async Task Help([Remainder] string command)
         {
             // should make sure to remove the prefix if the user included that.
         }
 
+        // TODO: Split message and return multiple builders if it gets too long.
         private EmbedBuilder GetHelpMessageEmbed()
         {
             var embedBuilder = new EmbedBuilder()
