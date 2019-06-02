@@ -47,6 +47,29 @@ namespace SpeldesignBotCore.Modules
             await ReplyAsync("", embed: embedBuilder.Build());
         }
 
+        [Command("classes")]
+        [Summary("Lists all the classes."), Remarks("classes")]
+        public async Task ListClasses()
+        {
+            var embedBuilder = new EmbedBuilder()
+            {
+                Title = "All classes",
+                Color = new Color(118, 196, 177)
+            };
+
+            foreach (var schoolClass in _botConfiguration.SchoolClasses)
+            {
+                var classRole = Context.Guild.GetRole(schoolClass.RoleId);
+                int studentsInServer = Context.Guild.Users.Where(x => x.Roles.Contains(classRole)).Count();
+                int studentsInClass = schoolClass.StudentNames.Count;
+
+                float studentsInServerProportion = (studentsInServer / (float) studentsInClass) * 100f;
+
+                embedBuilder.AddField(schoolClass.Name, 
+                    $"{classRole.Mention} students joined: {studentsInServer}/{studentsInClass} ({studentsInServerProportion.ToString("0.##")}%)");
+            }
+
+            await ReplyAsync("", embed: embedBuilder.Build());
         }
     }
 }
