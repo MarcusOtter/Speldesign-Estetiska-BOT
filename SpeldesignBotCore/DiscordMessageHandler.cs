@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using SpeldesignBotCore.Entities;
@@ -26,7 +27,37 @@ namespace SpeldesignBotCore
             _registrationHandler = registrationHandler;
         }
 
-        public async Task HandleMessageAsync(SocketMessage message)
+        public async Task HandleMessageEditedAsync(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel)
+        {
+            var messageBeforeEdit = before.Value as SocketUserMessage;
+            var messageAfterEdit = after as SocketUserMessage;
+
+            if (messageBeforeEdit is null || messageAfterEdit is null) { return; }
+
+            var context = new SocketCommandContext(_client, messageAfterEdit);
+            if (context.User.IsBot) { return; }
+
+            // If this is the first time this message is edited, try executing a command on it
+            // (some users edit their messages to fix their incorrect command usage)
+            if (messageBeforeEdit.EditedTimestamp is null)
+            {
+                await _commandHandler.HandleCommand(messageAfterEdit, context);
+            }
+
+            // Don't do anything else if the message was sent in DMs
+            if (context.IsPrivate) { return; }
+
+            await _messageLogger.LogMessageEdited(messageBeforeEdit, messageAfterEdit, context.Guild);
+
+            // If the message is in the registration channel, try to register with the updated message
+            if (context.Channel.Id == _botConfig.RegistrationChannelId)
+            {
+                await _registrationHandler.TryRegisterNewUser(context);
+                return;
+            }
+        }
+
+        public async Task HandleMessageSentAsync(SocketMessage message)
         {
             var msg = message as SocketUserMessage;
             var context = new SocketCommandContext(_client, msg);
@@ -42,7 +73,7 @@ namespace SpeldesignBotCore
                 return;
             }
 
-            await _messageLogger.LogToLoggingChannel(msg);
+            await _messageLogger.LogMessageSent(msg, context.Guild);
 
             if (context.Channel.Id == _botConfig.RegistrationChannelId)
             {

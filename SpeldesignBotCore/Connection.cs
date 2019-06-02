@@ -25,7 +25,9 @@ namespace SpeldesignBotCore
             await _client.LoginAsync(TokenType.Bot, config.Token);
             await _client.StartAsync();
 
-            _client.MessageReceived += _messageHandler.HandleMessageAsync;
+            _client.MessageReceived += _messageHandler.HandleMessageSentAsync;
+            _client.MessageUpdated += _messageHandler.HandleMessageEditedAsync;
+
             await _client.SetGameAsync($"\"{config.Prefix}help\"", type: ActivityType.Listening);
 
             await Task.Delay(-1);

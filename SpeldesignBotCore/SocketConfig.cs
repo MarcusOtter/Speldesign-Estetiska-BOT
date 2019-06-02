@@ -9,7 +9,8 @@ namespace SpeldesignBotCore
         {
             return new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Verbose
+                LogLevel = LogSeverity.Verbose,
+                MessageCacheSize = 32
             };
         }
 

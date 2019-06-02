@@ -10,7 +10,7 @@ namespace SpeldesignBotCore.Loggers
         private readonly ulong _logChannelId;
         private readonly DiscordSocketClient _client;
 
-        private ISocketMessageChannel LogChannel 
+        private ISocketMessageChannel _logChannel 
             => (ISocketMessageChannel) _client.GetChannel(_logChannelId);
 
         public DiscordMessageLogger(DiscordSocketClient client)
@@ -19,23 +19,34 @@ namespace SpeldesignBotCore.Loggers
             _logChannelId = Unity.Resolve<BotConfiguration>().LoggingChannelId;
         }
 
-        public async Task LogToLoggingChannel(SocketMessage message)
+        public async Task LogMessageSent(SocketMessage message, SocketGuild guild)
         {
-            var embed = new EmbedBuilder();
-            embed.WithAuthor(GetPrettyAuthorName(message.Author));
-            embed.WithDescription(message.Content);
-            embed.WithFooter($"Skickat i #{message.Channel.Name}");
-            embed.WithColor(81, 193, 158);
+            var embedBuilder = new EmbedBuilder()
+                .WithAuthor(GetPrettyAuthorName(message.Author))
+                .WithThumbnailUrl(message.Author.GetAvatarUrl(size: 32))
+                .WithDescription($"{message.Content}\n" + @"**\_\_\_\_\_\_\_\_\_\_**" 
+                    + $"\n[*Message sent in #{message.Channel.Name}*](https://discordapp.com/channels/{guild.Id}/{message.Channel.Id}/{message.Id})")
+                .WithColor(118, 196, 177)
+                .WithCurrentTimestamp();
 
-            await LogChannel.SendMessageAsync("", embed: embed.Build());
+            await _logChannel.SendMessageAsync("", embed: embedBuilder.Build());
         }
 
-        public void LogMsgDeleted(string username, string message, string channelName)
+        public async Task LogMessageEdited(SocketMessage messageBefore, SocketMessage messageAfter, SocketGuild guild)
         {
-            // TODO
+            var embedBuilder = new EmbedBuilder()
+                .WithAuthor(GetPrettyAuthorName(messageAfter.Author))
+                .WithThumbnailUrl(messageAfter.Author.GetAvatarUrl(size: 32))
+                .AddField("__Message before__", messageBefore.Content, inline: true)
+                .AddField("__Message after__", messageAfter.Content, inline: true)
+                .AddField(@"\_\_\_\_\_\_\_\_\_\_", $"\n\n[*Message edited in #{messageAfter.Channel.Name}*](https://discordapp.com/channels/{guild.Id}/{messageAfter.Channel.Id}/{messageAfter.Id})")
+                .WithColor(118, 196, 177)
+                .WithCurrentTimestamp();
+
+            await _logChannel.SendMessageAsync("", embed: embedBuilder.Build());  
         }
 
-        public void LogMsgEdited(string username, string newMessage, string channelName)
+        public void LogMessageDeleted(string username, string message, string channelName)
         {
             // TODO
         }
