@@ -14,7 +14,9 @@ namespace SpeldesignBotCore.Entities
         public ulong AlumniRoleId;
         public List<SchoolClass> SchoolClasses;
 
-        public List<ulong> SchoolClassesRoleIds => SchoolClasses.Select(x => x.RoleId).ToList();
+        // Made internal so it doesn't get serialized into the json
+        internal List<ulong> SchoolClassesRoleIds => SchoolClasses.Select(x => x.RoleId).ToList();
+
         private readonly IDataStorage _dataStorage;
 
         public BotConfiguration()

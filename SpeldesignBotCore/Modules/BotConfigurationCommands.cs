@@ -29,11 +29,24 @@ namespace SpeldesignBotCore.Modules
 
             // Create a string[] of the students' names, correctly formatted.
             var studentNames = names.Split(',');
-            foreach(var name in studentNames) { name.Trim(); }
+            for (int i = 0; i < studentNames.Length; i++)
+            {
+                studentNames[i] = studentNames[i].Trim();
+            }
 
             var newClass = new SchoolClass(classRole.Name, classRole.Id, studentNames.ToList());
             _botConfiguration.SchoolClasses.Add(newClass);
             _botConfiguration.Save();
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle("Success!")
+                .WithDescription($"Added class {classRole.Mention} with {newClass.StudentNames.Count} students.")
+                .WithColor(118, 196, 177)
+                .WithFooter($"Something wrong? {_botConfiguration.Prefix}removeclass and {_botConfiguration.Prefix}classes to the rescue!");
+
+            await ReplyAsync("", embed: embedBuilder.Build());
+        }
+
         }
     }
 }
