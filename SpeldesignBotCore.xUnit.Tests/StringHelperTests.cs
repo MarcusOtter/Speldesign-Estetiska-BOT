@@ -103,11 +103,35 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void StringHelper_FindClosestMatch_CorrectMatchTest3()
         {
-            string[] possibleOutputs = new string[] { "one string" };
+            string[] possibleOutputs = new string[] { "anything1", "anything2" };
             const string input = "anything";
-            string[] expected = new string[] { "one string" };
+            string[] expected = new string[] { "anything1", "anything2" };
 
             var actual = possibleOutputs.FindClosestMatch(input);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void StringHelper_FindClosestMatch_MaxDistanceTest1()
+        {
+            string[] possibleOutputs = new string[] { "Marcus Otterström", "Samuel Lundberg", "Other Name" };
+            const string input = "marcus otterströmm"; // 3 distance
+            string[] expected = new string[0];
+
+            var actual = possibleOutputs.FindClosestMatch(input, maxDistance: 2);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void StringHelper_FindClosestMatch_MaxDistanceTest2()
+        {
+            string[] possibleOutputs = new string[] { "Marcus Otterström", "Samuel Lundberg", "Other Name" };
+            const string input = "marcus otterströmm"; // 3 distance
+            string[] expected = new string[] { "Marcus Otterström" };
+
+            var actual = possibleOutputs.FindClosestMatch(input, maxDistance: 3);
 
             Assert.Equal(expected, actual);
         }
