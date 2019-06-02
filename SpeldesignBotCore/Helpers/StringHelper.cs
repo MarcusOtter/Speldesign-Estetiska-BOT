@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SpeldesignBotCore.Helpers
+namespace SpeldesignBotCore
 {
     public static class StringHelper
     {
