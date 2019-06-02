@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using SpeldesignBotCore.Entities;
 using SpeldesignBotCore.Loggers;
 using SpeldesignBotCore.Modules.Giveaways;
+using SpeldesignBotCore.Registration;
 using SpeldesignBotCore.Storage;
 using SpeldesignBotCore.Storage.Implementations;
 using Unity;
@@ -29,7 +30,7 @@ namespace SpeldesignBotCore
             _container = new UnityContainer();
 
             _container.RegisterSingleton<IDataStorage, JsonStorage>();
-            _container.RegisterSingleton<BotConfiguration>();
+            _container.RegisterSingleton<BotConfiguration>(new InjectionConstructor(typeof(IDataStorage)));
 
             _container.RegisterType<DiscordSocketConfig>(new InjectionFactory(i => SocketConfig.GetDefault())); // Return default config when asking for a DiscordSocketConfig
             _container.RegisterSingleton<DiscordSocketClient>(new InjectionConstructor(typeof(DiscordSocketConfig))); // Make DiscordSocketClient use the constructor with DiscordSocketConfig
@@ -40,6 +41,7 @@ namespace SpeldesignBotCore
             _container.RegisterSingleton<DiscordCommandHandler>();
             _container.RegisterSingleton<DiscordMessageLogger>();
 
+            _container.RegisterSingleton<RegistrationHandler>();
             _container.RegisterSingleton<GiveawayRepo>();
 
             _container.RegisterSingleton<Connection>();

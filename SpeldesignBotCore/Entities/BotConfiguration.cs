@@ -1,34 +1,42 @@
 ﻿using SpeldesignBotCore.Storage;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SpeldesignBotCore.Entities
 {
-    // This whole class is pretty sketchy, needs to be refactored and reorganized
     public class BotConfiguration
     {
-        // Can't be readonly because then json can't convert to this format, I think.
+        // Can't be readonly because then Newtonsoft JSON can't Deserialize to this object.
         public string Token;
         public string Prefix;
         public ulong LoggingChannelId;
         public ulong RegistrationChannelId;
+        public ulong AlumniRoleId;
+        public List<SchoolClass> SchoolClasses;
+
+        // Made internal so it doesn't get serialized into the json
+        internal List<ulong> SchoolClassesRoleIds => SchoolClasses.Select(x => x.RoleId).ToList();
 
         private readonly IDataStorage _dataStorage;
 
         public BotConfiguration()
         {
-            // Sketchy because this is how Newtonsoft JSON needs to instantiate it,
-            // but Unity might pick this constructor over the other one when doing Unity.Resolve<BotConfiguration>()
+            // This constructor is used for Newtonsoft JSON to deserialize the object.
+            // When resolving with Unity, it's forced to pick the other constructor through an InjectionConstructor.
         }
-
+        
         public BotConfiguration(IDataStorage storage)
         {
             _dataStorage = storage;
 
-            var botConfig = storage.RestoreObject<BotConfiguration>("Config/BotConfig");
+            var botConfig = _dataStorage.RestoreObject<BotConfiguration>("Config/BotConfig");
 
             Token = botConfig.Token;
             Prefix = botConfig.Prefix;
             LoggingChannelId = botConfig.LoggingChannelId;
             RegistrationChannelId = botConfig.RegistrationChannelId;
+            AlumniRoleId = botConfig.AlumniRoleId;
+            SchoolClasses = botConfig.SchoolClasses;
         }
 
         public void Save()
