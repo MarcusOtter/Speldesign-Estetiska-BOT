@@ -23,12 +23,14 @@ namespace SpeldesignBotCore.Modules
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle($"Information about {botUser.Username}")
-                .AddField("Usage info", $"Current prefix: `{_botConfiguration.Prefix}`\nHelp command: `{_botConfiguration.Prefix}help`", inline: true)
-                .AddField("Created", botUser.CreatedAt.ToLocalTime().Date.ToString("dd/MM-yyyy"), inline: true)
+                .AddField("How to use", $"`{_botConfiguration.Prefix}help`\n__or__\n{botUser.Mention} help", inline: true)
+                //.AddField("Created", botUser.CreatedAt.ToLocalTime().Date.ToString("dd/MM-yyyy"), inline: true)
+                .WithThumbnailUrl(botUser.GetAvatarUrl(size: 64))
                 .AddField("Useful links",
-                    "[Source code](https://github.com/LeMorrow/Speldesign-Estetiska-BOT)\n" +
-                    "[Planned features](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)\n", inline: true)
-                .WithFooter("Made by LeMorrow#8192")
+                    "• [Source code](https://github.com/LeMorrow/Speldesign-Estetiska-BOT)\n" +
+                    "• [Request a feature](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/issues/new?assignees=LeMorrow&labels=enhancement&template=feature_request.md&title=)\n" +
+                    "• [Report an issue](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/issues/new?assignees=LeMorrow&labels=bug&template=bug_report.md&title=Bug+with...)", inline: true)
+                .WithFooter("Bot made by LeMorrow#8192")
                 .WithColor(118, 196, 177);
 
             await ReplyAsync("", embed: embedBuilder.Build());
