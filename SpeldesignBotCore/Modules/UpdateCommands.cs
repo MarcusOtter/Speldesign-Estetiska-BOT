@@ -8,10 +8,10 @@ namespace SpeldesignBotCore.Modules
     public class UpdateCommands : ModuleBase
     {
         [Command("checkupdate")]
-        [Summary("Check if the bot has an update available"), Remarks("checkupdate")]
-        public async Task CheckUpdate()
+        [Summary("Check if the bot has an update available from the specified upstream. Defaults to origin/master."), Remarks("checkupdate [upstream]")]
+        public async Task CheckUpdate([Remainder] string upstream = null)
         {
-            var process = RunCommandLineScript(@"shell/checkupdate", "origin/master");
+            var process = RunCommandLineScript(@"shell/checkupdate", upstream ?? "origin/master");
             string result = process.StandardOutput.ReadLine();
             await ReplyAsync(result);
         }
