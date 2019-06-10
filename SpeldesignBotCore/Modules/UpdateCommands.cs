@@ -8,11 +8,19 @@ using SpeldesignBotCore.Loggers;
 using System.Reflection;
 using Discord.WebSocket;
 using System.IO;
+using SpeldesignBotCore.Entities;
 
 namespace SpeldesignBotCore.Modules
 {
     public class UpdateCommands : ModuleBase
     {
+        private readonly BotConfiguration _botConfiguration;
+
+        public UpdateCommands()
+        {
+            _botConfiguration = Unity.Resolve<BotConfiguration>();
+        }
+
         [Command("checkupdate")]
         [Summary("Check if the bot has an update available from the specified upstream. Defaults to origin/master."), Remarks("checkupdate [upstream]")]
         [RequireUserPermission(GuildPermission.BanMembers)]
@@ -20,11 +28,27 @@ namespace SpeldesignBotCore.Modules
         {
             upstream = upstream ?? "origin/master";
 
-            string message = BotNeedsUpdate(upstream)
-                ? $"This branch is outdated compared to {upstream}. Run the update command to update the bot."
-                : $"This branch is up to date with {upstream}";
+            var needsUpdate = BotNeedsUpdate(upstream);
 
-            await ReplyAsync(message);
+            var title = needsUpdate 
+                ? "Outdated" 
+                : "Up to date";
+
+            var description = needsUpdate
+                ? $"There are updates on the server.\nRun `{_botConfiguration.Prefix}update` to download the latest version."
+                : "This bot is up to date with the server.";
+
+            var color = needsUpdate
+                ? new Color(255, 79, 79)
+                : new Color(118, 196, 177);
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle(title)
+                .WithDescription(description)
+                .WithColor(color)
+                .WithFooter($"Checking against the '{upstream}' branch");
+
+            await ReplyAsync("", embed: embedBuilder.Build());
         }
 
         [Command("update")]
@@ -36,7 +60,13 @@ namespace SpeldesignBotCore.Modules
 
             if (!BotNeedsUpdate(upstream))
             {
-                await ReplyAsync("The bot is already up to date!");
+                var embedBuilder = new EmbedBuilder()
+                    .WithTitle("Already up to date")
+                    .WithDescription("The bot is already up to date with the server.")
+                    .WithColor(118, 196, 177)
+                    .WithFooter($"Checking against the '{upstream}' branch");
+
+                await ReplyAsync("", embed: embedBuilder.Build());
                 return;
             }
 
@@ -70,7 +100,7 @@ namespace SpeldesignBotCore.Modules
                 case "Up to date": return false;
                 case "Outdated": return true;
 
-                default: throw new Exception($"The commandline script 'checkupdate' does not work correctly for {Environment.OSVersion}");
+                default: throw new Exception($"The shell script 'checkupdate' does not work correctly for {Environment.OSVersion}");
             }
         }
 
@@ -99,8 +129,13 @@ namespace SpeldesignBotCore.Modules
                 processStartInfo.FileName = "/bin/sh";
                 processStartInfo.Arguments = $"{scriptPath}.sh {string.Join(' ', args)}";
             }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                processStartInfo.FileName = "/Applications/Utilities/Terminal.app";
+                processStartInfo.Arguments = $"sh {scriptPath}.sh {string.Join(' ', args)}";
+            }
 
-            // TODO: Exceptions when on mac
+            // TODO: test on mac and linux
 
             var process = Process.Start(processStartInfo);
             process.WaitForExit();
