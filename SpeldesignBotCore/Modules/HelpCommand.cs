@@ -24,9 +24,11 @@ namespace SpeldesignBotCore.Modules
 
             var embedBuilder = GetHelpMessageEmbed();
 
+            IUserMessage dmMessage = null;
+
             try
             {
-                await dmChannel.SendMessageAsync("", embed: embedBuilder.Build());
+                dmMessage = await dmChannel.SendMessageAsync("", embed: embedBuilder.Build());
             }
             // If the user does not allow direct messages from this server, just send it in the channel.
             catch (Discord.Net.HttpException) 
@@ -38,7 +40,12 @@ namespace SpeldesignBotCore.Modules
 
             if (!Context.IsPrivate)
             {
-                await ReplyAsync("Sent a list of all commands to your DMs.");
+                var messageLinkEmbedBuilder = new EmbedBuilder()
+                    .WithTitle("Sent a list of all commands to your DMs.")
+                    .WithDescription($"You can find the message [here](https://discordapp.com/channels/@me/{dmMessage.Channel.Id}/{dmMessage.Id}).")
+                    .WithColor(118, 196, 177);
+
+                await ReplyAsync("", embed: messageLinkEmbedBuilder.Build());
             }
         }
 
