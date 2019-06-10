@@ -42,7 +42,7 @@ namespace SpeldesignBotCore.Modules
 
             await ReplyAsync("Downloading the latest update, please wait...");
 
-            var process = RunCommandLineScript("shell/update", upstream);
+            var process = RunShellScript("shell/update", upstream);
             Unity.Resolve<StatusLogger>().LogToConsole(process.StandardOutput.ReadToEnd());
 
             await ReplyAsync("Update downloaded! Restarting...");
@@ -62,7 +62,7 @@ namespace SpeldesignBotCore.Modules
 
         private bool BotNeedsUpdate(string upstream)
         {
-            var process = RunCommandLineScript("shell/checkupdate", upstream);
+            var process = RunShellScript("shell/checkupdate", upstream);
             string result = process.StandardOutput.ReadLine();
 
             switch (result)
@@ -74,10 +74,10 @@ namespace SpeldesignBotCore.Modules
             }
         }
 
-        /// <summary>Executes a command line script. Exclude file extension in the <paramref name="scriptPath"/>.</summary>
+        /// <summary>Executes a shell script. Exclude file extension in the <paramref name="scriptPath"/>.</summary>
         /// <param name="scriptPath">The path to the script to execute, without file extension. This method appends .sh or .bat depending on the current OS.</param>
         /// <param name="args">Arguments to be passed to the script.</param>
-        private static Process RunCommandLineScript(string scriptPath, params string[] args)
+        private static Process RunShellScript(string scriptPath, params string[] args)
         {
             ProcessStartInfo processStartInfo = new ProcessStartInfo()
             {
