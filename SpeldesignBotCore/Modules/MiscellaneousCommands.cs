@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using SpeldesignBotCore.Entities;
 using System.Threading.Tasks;
 
@@ -24,7 +23,6 @@ namespace SpeldesignBotCore.Modules
             var embedBuilder = new EmbedBuilder()
                 .WithTitle($"Information about {botUser.Username}")
                 .AddField("How to use", $"`{_botConfiguration.Prefix}help`\n__or__\n{botUser.Mention} help", inline: true)
-                //.AddField("Created", botUser.CreatedAt.ToLocalTime().Date.ToString("dd/MM-yyyy"), inline: true)
                 .WithThumbnailUrl(botUser.GetAvatarUrl(size: 64))
                 .AddField("Useful links",
                     "• [Source code](https://github.com/LeMorrow/Speldesign-Estetiska-BOT)\n" +
