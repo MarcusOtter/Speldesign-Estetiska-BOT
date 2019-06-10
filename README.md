@@ -4,5 +4,3 @@
 
 
 Discord bot made for a school discord server.
-
-This is an edit for testing purposes.
