@@ -5,4 +5,4 @@ Discord bot made for a school discord server.
 [![codecov](https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT/branch/master/graph/badge.svg)](https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT)
 [![Uppsala kommun logotype](https://www.uppsala.se/Content/Images/socialmedia_v2.png)](https://estetiska.uppsala.se/)
 
-Test update 2
+Test update 3
