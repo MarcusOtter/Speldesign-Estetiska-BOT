@@ -1,0 +1,36 @@
+{
+  "Token": "enter-token-here",
+  "Prefix": ".",
+  "LoggingChannelId": 123456789,
+  "RegistrationChannelId": 123456789,
+  "AlumniRoleId": 123456789,
+  "SchoolClasses": [
+    {
+      "Name": "EX01",
+      "RoleId": 123456789,
+      "StudentNames": [
+        "John Doe One",
+        "John Doe Two",
+        "John Doe Three"
+      ]
+    },
+    {
+      "Name": "EX02",
+      "RoleId": 123456789,
+      "StudentNames": [
+        "John Doe"
+      ]
+    },
+    {
+      "Name": "EX03",
+      "RoleId": 123456789,
+      "StudentNames": [
+        "John Doe One",
+        "John Doe Two",
+        "John Doe Three",
+        "John Doe Four",
+        "John Doe Five"
+      ]
+    }
+  ]
+}
