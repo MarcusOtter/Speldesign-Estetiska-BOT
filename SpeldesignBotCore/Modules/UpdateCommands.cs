@@ -124,18 +124,14 @@ namespace SpeldesignBotCore.Modules
                 processStartInfo.FileName = "cmd.exe";
                 processStartInfo.Arguments = $"/C {scriptPath}.bat {string.Join(' ', args)}";
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || 
+                     RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 processStartInfo.FileName = "/bin/sh";
                 processStartInfo.Arguments = $"{scriptPath}.sh {string.Join(' ', args)}";
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                processStartInfo.FileName = "/Applications/Utilities/Terminal.app";
-                processStartInfo.Arguments = $"sh {scriptPath}.sh {string.Join(' ', args)}";
-            }
 
-            // TODO: test on mac and linux
+            // TODO: test on linux
 
             var process = Process.Start(processStartInfo);
             process.WaitForExit();
