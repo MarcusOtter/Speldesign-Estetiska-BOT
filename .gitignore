@@ -333,3 +333,6 @@ ASALocalRun/
 
 # Config directory
 Config/
+
+# Mac file system
+*.DS_STORE
