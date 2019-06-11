@@ -1,5 +1,4 @@
 @ECHO OFF
-REM Assigns the first parameter to the variable %UPSTREAM%
 SET UPSTREAM=%1
 IF [%UPSTREAM%]==[] (
     ECHO The upstream parameter is missing.
