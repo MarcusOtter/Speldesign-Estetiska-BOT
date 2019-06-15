@@ -102,6 +102,8 @@ namespace SpeldesignBotCore.Modules
                 await socketClient.LogoutAsync();
             }
 
+            // test update
+
             Environment.Exit(0);
         }
 
