@@ -28,7 +28,7 @@ namespace SpeldesignBotCore.Modules
         {
             upstream = upstream ?? "origin/master";
 
-            var needsUpdate = BotNeedsUpdate(upstream);
+            var needsUpdate = await BotNeedsUpdate(upstream);
 
             var title = needsUpdate 
                 ? "Outdated" 
@@ -58,7 +58,7 @@ namespace SpeldesignBotCore.Modules
         {
             upstream = upstream ?? "origin/master";
 
-            if (!BotNeedsUpdate(upstream))
+            if (!await BotNeedsUpdate(upstream))
             {
                 var embedBuilder = new EmbedBuilder()
                     .WithTitle("Already up to date")
@@ -72,7 +72,7 @@ namespace SpeldesignBotCore.Modules
 
             await ReplyAsync("Downloading the latest update, please wait...");
 
-            var process = RunShellScript("shell/update", upstream);
+            var process = await RunShellScriptAsync("shell/update", upstream);
             Unity.Resolve<StatusLogger>().LogToConsole(process.StandardOutput.ReadToEnd());
 
             await ReplyAsync("Update downloaded! Restarting...");
@@ -90,9 +90,9 @@ namespace SpeldesignBotCore.Modules
             Environment.Exit(0);
         }
 
-        private bool BotNeedsUpdate(string upstream)
+        private async Task<bool> BotNeedsUpdate(string upstream)
         {
-            var process = RunShellScript("shell/checkupdate", upstream);
+            var process = await RunShellScriptAsync("shell/checkupdate", upstream);
             string result = process.StandardOutput.ReadLine();
 
             switch (result)
@@ -107,7 +107,7 @@ namespace SpeldesignBotCore.Modules
         /// <summary>Executes a shell script. Exclude file extension in the <paramref name="scriptPath"/>.</summary>
         /// <param name="scriptPath">The path to the script to execute, without file extension. This method appends .sh or .bat depending on the current OS.</param>
         /// <param name="args">Arguments to be passed to the script.</param>
-        private static Process RunShellScript(string scriptPath, params string[] args)
+        private static Task<Process> RunShellScriptAsync(string scriptPath, params string[] args)
         {
             ProcessStartInfo processStartInfo = new ProcessStartInfo()
             {
@@ -131,12 +131,18 @@ namespace SpeldesignBotCore.Modules
                 processStartInfo.Arguments = $"{scriptPath}.sh {string.Join(' ', args)}";
             }
 
-            // TODO: test on linux
+            var taskCompletionSource = new TaskCompletionSource<Process>();
 
-            var process = Process.Start(processStartInfo);
-            process.WaitForExit();
-            
-            return process;
+            var process = new Process()
+            {
+                StartInfo = processStartInfo,
+                EnableRaisingEvents = true
+            };
+
+            process.Exited += (sender, eventArgs) => { taskCompletionSource.SetResult(process); };
+            process.Start();
+
+            return taskCompletionSource.Task;
         }
     }
 }
