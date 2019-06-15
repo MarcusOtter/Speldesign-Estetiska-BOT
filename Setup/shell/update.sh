@@ -6,5 +6,9 @@ if [ -z "$UPSTREAM" ]; then
 fi
 
 git merge $UPSTREAM
-dotnet publish -c Release > /dev/null
+
+SCRIPT_PATH=$(dirname `which $0`)
+cd ${SCRIPT_PATH}/..
+dotnet publish ../../../SpeldesignBotCore.csproj -c Release
+
 echo "Updated"

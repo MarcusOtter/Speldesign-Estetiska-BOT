@@ -6,6 +6,8 @@ IF [%UPSTREAM%]==[] (
 )
 
 git merge %UPSTREAM%
-dotnet publish -c Release > nul
+cd ..\
+dotnet publish ..\..\..\SpeldesignBotCore.csproj -c Release
+
 ECHO Updated
 :end
