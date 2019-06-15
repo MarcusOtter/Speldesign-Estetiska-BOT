@@ -30,9 +30,6 @@ namespace SpeldesignBotCore
 
             await _client.SetGameAsync($"\"{config.Prefix}help\"", type: ActivityType.Listening);
 
-            // Temporary 
-            await _client.GetGuild(458191009084604417).GetTextChannel(526166967850106881).SendMessageAsync("Back online.");
-
             await Task.Delay(-1);
         }
     }
