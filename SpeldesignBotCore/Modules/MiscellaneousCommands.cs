@@ -45,5 +45,12 @@ namespace SpeldesignBotCore.Modules
             await (Context.Client as DiscordSocketClient).LogoutAsync();
             Environment.Exit(0);
         }
+
+        [Command("tempcommand")]
+        [Summary("This is a temporary command"), Remarks("tempcommand")]
+        public async Task TempCommand()
+        {
+            await ReplyAsync("This temporary command was just added. Did it actually run? You're a genius, Marcus. Auto deploy fully works.");
+        }
     }
 }
