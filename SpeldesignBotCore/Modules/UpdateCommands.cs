@@ -85,7 +85,7 @@ namespace SpeldesignBotCore.Modules
             if (socketClient.ConnectionState == ConnectionState.Connected)
             {
                 await ReplyAsync("Update downloaded! Restarting...");
-                await socketClient.SetGameAsync("restarting...", type: ActivityType.Playing);
+                await socketClient.SetGameAsync("new features being installed...", type: ActivityType.Watching);
             }
 
             ProcessStartInfo newBuildStartInfo = new ProcessStartInfo()
@@ -101,8 +101,6 @@ namespace SpeldesignBotCore.Modules
                 await socketClient.SetStatusAsync(UserStatus.Invisible);
                 await socketClient.LogoutAsync();
             }
-
-            // test update
 
             Environment.Exit(0);
         }
