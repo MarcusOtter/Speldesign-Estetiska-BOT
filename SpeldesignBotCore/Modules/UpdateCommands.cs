@@ -78,8 +78,15 @@ namespace SpeldesignBotCore.Modules
             var process = await RunShellScriptAsync("shell/update", upstream);
             Unity.Resolve<StatusLogger>().LogToConsole(process.StandardOutput.ReadToEnd());
 
-            await ReplyAsync("Update downloaded! Restarting...");
-            await socketClient.SetGameAsync("restarting...", type: ActivityType.Playing);
+            // From this point on, we need to check if the bot is still connected before doing
+            // any actions from the client. There's a chance the update script takes too long
+            // (especially on Raspberry Pi) which leads to the bot disconnecting. 
+
+            if (socketClient.ConnectionState == ConnectionState.Connected)
+            {
+                await ReplyAsync("Update downloaded! Restarting...");
+                await socketClient.SetGameAsync("restarting...", type: ActivityType.Playing);
+            }
 
             ProcessStartInfo newBuildStartInfo = new ProcessStartInfo()
             {
@@ -89,8 +96,12 @@ namespace SpeldesignBotCore.Modules
 
             Process.Start(newBuildStartInfo);
 
-            await socketClient.SetStatusAsync(UserStatus.Invisible);
-            await socketClient.LogoutAsync();
+            if (socketClient.ConnectionState == ConnectionState.Connected)
+            {
+                await socketClient.SetStatusAsync(UserStatus.Invisible);
+                await socketClient.LogoutAsync();
+            }
+
             Environment.Exit(0);
         }
 
