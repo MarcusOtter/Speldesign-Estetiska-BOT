@@ -23,7 +23,6 @@ namespace SpeldesignBotCore.Modules
 
         [Command("checkupdate")]
         [Summary("Check if the bot has an update available from the specified upstream. Defaults to origin/master."), Remarks("checkupdate [upstream]")]
-        [RequireUserPermission(GuildPermission.BanMembers)]
         public async Task CheckUpdate([Remainder] string upstream = null)
         {
             upstream = upstream ?? "origin/master";
@@ -53,7 +52,7 @@ namespace SpeldesignBotCore.Modules
 
         [Command("update")]
         [Summary("Update the bot to the latest version from the specified upstream. Defaults to origin/master."), Remarks("update [upstream]")]
-        [RequireUserPermission(GuildPermission.BanMembers)]
+        [RequireOwner]
         public async Task Update([Remainder] string upstream = null)
         {
             upstream = upstream ?? "origin/master";
