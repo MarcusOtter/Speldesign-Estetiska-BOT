@@ -78,9 +78,6 @@ namespace SpeldesignBotCore.Modules
             var process = await RunShellScriptAsync("shell/update", upstream);
             Unity.Resolve<StatusLogger>().LogToConsole(process.StandardOutput.ReadToEnd());
 
-            // Temporary
-            await Task.Delay(10000);
-
             await ReplyAsync("Update downloaded! Restarting...");
             await socketClient.SetGameAsync("restarting...", type: ActivityType.Playing);
 
