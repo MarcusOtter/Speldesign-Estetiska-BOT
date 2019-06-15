@@ -57,6 +57,7 @@ namespace SpeldesignBotCore.Modules
         public async Task Update([Remainder] string upstream = null)
         {
             upstream = upstream ?? "origin/master";
+            var socketClient = Context.Client as DiscordSocketClient;
 
             if (!await BotNeedsUpdate(upstream))
             {
@@ -71,12 +72,14 @@ namespace SpeldesignBotCore.Modules
             }
 
             await ReplyAsync("Downloading the latest update, please wait...");
+            await socketClient.SetStatusAsync(UserStatus.DoNotDisturb);
+            await socketClient.SetGameAsync("updating...", type: ActivityType.Playing);
 
             var process = await RunShellScriptAsync("shell/update", upstream);
             Unity.Resolve<StatusLogger>().LogToConsole(process.StandardOutput.ReadToEnd());
 
             await ReplyAsync("Update downloaded! Restarting...");
-
+            await socketClient.SetGameAsync("restarting...", type: ActivityType.Playing);
 
             ProcessStartInfo newBuildStartInfo = new ProcessStartInfo()
             {
@@ -86,7 +89,8 @@ namespace SpeldesignBotCore.Modules
 
             Process.Start(newBuildStartInfo);
 
-            await (Context.Client as DiscordSocketClient).LogoutAsync();
+            await socketClient.SetStatusAsync(UserStatus.Invisible);
+            await socketClient.LogoutAsync();
             Environment.Exit(0);
         }
 
