@@ -6,6 +6,8 @@ namespace SpeldesignBotCore.Storage.Implementations
 {
     public class JsonStorage : IDataStorage
     {
+        public bool HasObject(string key) => File.Exists($"{key}.json");
+
         public T RestoreObject<T>(string key)
         {
             string json = string.Empty;

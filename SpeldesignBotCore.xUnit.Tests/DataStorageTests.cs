@@ -14,6 +14,76 @@ namespace SpeldesignBotCore.xUnit.Tests
         }
 
         [Fact]
+        public void DataStorage_InMemoryStorage_RestoreObject_MissingKeyTest()
+        {
+            IDataStorage storage = new InMemoryStorage();
+            Assert.Throws<System.ArgumentException>(() => storage.RestoreObject<string>("fake-key"));
+        }
+
+        [Fact]
+        public void DataStorage_JsonStorage_RestoreObject_MissingKeyTest()
+        {
+            IDataStorage storage = new JsonStorage();
+            Assert.Throws<System.ArgumentException>(() => storage.RestoreObject<string>("fake-key"));
+        }
+
+        [Fact]
+        public void DataStorage_InMemoryStorage_HasObject_Missing()
+        {
+            IDataStorage storage = new InMemoryStorage();
+
+            const string input = "missing";
+            const bool expected = false;
+            var actual = storage.HasObject(input);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void DataStorage_JsonStorage_HasObject_Missing()
+        {
+            IDataStorage storage = new JsonStorage();
+
+            const string input = "misisng";
+            const bool expected = false;
+            var actual = storage.HasObject(input);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void DataStorage_InMemoryStorage_HasObject_Existing()
+        {
+            IDataStorage storage = new InMemoryStorage();
+
+            const string key = "Test/key";
+            const int obj = 6;
+
+            storage.StoreObject(obj, key);
+
+            const bool expected = true;
+            var actual = storage.HasObject(key);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void DataStorage_JsonStorage_HasObject_Existing()
+        {
+            IDataStorage storage = new JsonStorage();
+
+            const string key = "Test/key";
+            const int obj = 6;
+
+            storage.StoreObject(obj, key);
+
+            const bool expected = true;
+            var actual = storage.HasObject(key);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void DataStorage_InMemoryStorage_OverrideTest()
         {
             const string key = "Config/TestKey";
@@ -31,30 +101,6 @@ namespace SpeldesignBotCore.xUnit.Tests
         }
 
         [Fact]
-        public void DataStorage_InMemoryStorage_RestoreObject_MissingKeyTest()
-        {
-            IDataStorage storage = new InMemoryStorage();
-            Assert.Throws<System.ArgumentException>(() => storage.RestoreObject<string>("fake-key"));
-        }
-
-        [Fact]
-        public void DataStorage_JsonStorage_RestoreObject_MissingKeyTest()
-        {
-            IDataStorage storage = new JsonStorage();
-            Assert.Throws<System.ArgumentException>(() => storage.RestoreObject<string>("fake-key"));
-        }
-
-        [Fact]
-        public void DataStorage_JsonStorage_StoreObject_InvalidKeyTest()
-        {
-            const string key = "configurationFile";
-            const string objectToStore = "some information";
-
-            IDataStorage storage = new JsonStorage();
-            Assert.Throws<System.ArgumentException>(() => storage.StoreObject(objectToStore, key));
-        }
-
-        [Fact]
         public void DataStorage_JsonStorage_OverrideTest()
         {
             const string key = "Config/TestKey";
@@ -69,6 +115,16 @@ namespace SpeldesignBotCore.xUnit.Tests
             var actual = storage.RestoreObject<string>(key);
 
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void DataStorage_JsonStorage_StoreObject_InvalidKeyTest()
+        {
+            const string key = "configurationFile";
+            const string objectToStore = "some information";
+
+            IDataStorage storage = new JsonStorage();
+            Assert.Throws<System.ArgumentException>(() => storage.StoreObject(objectToStore, key));
         }
     }
 }
