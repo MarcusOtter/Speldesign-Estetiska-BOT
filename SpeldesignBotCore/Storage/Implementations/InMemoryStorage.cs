@@ -7,6 +7,8 @@ namespace SpeldesignBotCore.Storage.Implementations
     {
         private readonly Dictionary<string, object> _dictionary = new Dictionary<string, object>();
 
+        public bool HasObject(string key) => _dictionary.ContainsKey(key);
+
         public void StoreObject(object obj, string key)
         {
             if (_dictionary.ContainsKey(key))
