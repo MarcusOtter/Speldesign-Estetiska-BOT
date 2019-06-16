@@ -34,6 +34,9 @@ namespace SpeldesignBotCore
 
             if (messageBeforeEdit is null || messageAfterEdit is null) { return; }
 
+            // If the new message is not edited, this edit event was likely caused by a delayed link embed
+            if (messageAfterEdit.EditedTimestamp is null) { return; }
+
             var context = new SocketCommandContext(_client, messageAfterEdit);
             if (context.User.IsBot) { return; }
 
