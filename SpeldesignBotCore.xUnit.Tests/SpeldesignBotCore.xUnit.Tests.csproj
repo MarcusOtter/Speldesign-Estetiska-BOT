@@ -8,6 +8,7 @@
     <PackageReference Include="xunit" Version="*"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="*"/>
     <PackageReference Include="xunit.runner.visualstudio" Version="*"/>
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpeldesignBotCore\SpeldesignBotCore.csproj"/>
