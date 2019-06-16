@@ -28,7 +28,8 @@ namespace SpeldesignBotCore.Modules
             }
             catch(Exception e)
             {
-                Unity.Resolve<Loggers.StatusLogger>().LogToConsole($"EXCEPTION: {e.Message}");
+                // This typically means that performance counters are not supported on this platform.
+                Unity.Resolve<Loggers.StatusLogger>().LogToConsole($"Performance counter exception: {e.Message}");
             }
         }
 
@@ -60,9 +61,17 @@ namespace SpeldesignBotCore.Modules
                 embedBuilder.AddField("__Host device information__", $"{botInfo.DeviceName} running {botInfo.OsName}", inline: true);
             }
 
+            if (_cpuCounter != null)
+            {
+                embedBuilder.AddField("__CPU usage__", await GetCpuUsage(), inline: true);
+            }
+
+            if (_memoryCounter != null)
+            {
+                embedBuilder.AddField("__Available RAM__", GetAvailableRam(), inline: true);
+            }
+
             embedBuilder
-                .AddField("__CPU usage__", await GetCpuUsage(), inline: true)
-                .AddField("__Available RAM__", GetAvailableRam(), inline: true)
                 .AddField("__Useful links__",
                     "• [Source code](https://github.com/LeMorrow/Speldesign-Estetiska-BOT)\n" +
                     "• [Request a feature](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/issues/new?assignees=LeMorrow&labels=enhancement&template=feature_request.md&title=)\n" +
