@@ -21,8 +21,15 @@ namespace SpeldesignBotCore.Modules
             _dataStorage = Unity.Resolve<IDataStorage>();
             _botConfiguration = Unity.Resolve<BotConfiguration>();
 
-            _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-            _memoryCounter = new PerformanceCounter("Memory", "Available MBytes");
+            try
+            {
+                _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                _memoryCounter = new PerformanceCounter("Memory", "Available MBytes");
+            }
+            catch(Exception e)
+            {
+                Unity.Resolve<Loggers.StatusLogger>().LogToConsole($"EXCEPTION: {e.Message}");
+            }
         }
 
         [Command("uptime")]
