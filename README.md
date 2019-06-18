@@ -107,10 +107,10 @@ A list of students from a class that have not joined the discord server yet.<br>
 
 ### `checkupdate [upstream]`
 Check if there is an update available from the specified upstream.
-`upstream` is an optional parameter that defaults to origin/master. This is the branch that should be checked against.
+`upstream` is an optional parameter that defaults to origin/master. This is the branch that should be checked against.<br>
 
 ### `update [upstream]`
-Download changes and update the bot from the specified upstream. 
+Download changes and update the bot from the specified upstream.<br>
 `upstream` is an optional parameter that defaults to origin/master. This is the branch that changes should be downloaded from.
 
 ### `draw [amount] [item]`
