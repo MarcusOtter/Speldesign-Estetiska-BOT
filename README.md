@@ -129,7 +129,7 @@ To join the server, users need to register is the following format: `@class Full
 *A typo is when the [levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) between the input and an existing name is less than 5 letters. If it is more than that the user is considered "unauthorized" and does not get a name suggestion.*
 
 ## Message logging
-If a logging channel is provided in the bot configuration, the bot will log messages in that channel. It also provides a link the message being logged.
+If a logging channel is provided in the bot configuration, the bot will log messages in that channel. It also provides a link to the message being logged.
 
 ### Sent messages
 ![](https://i.imgur.com/o2OxViy.png)
