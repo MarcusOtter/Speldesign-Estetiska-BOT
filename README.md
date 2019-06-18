@@ -21,6 +21,22 @@ The bot currently has `13` working commands. There are many more features planne
 
 *:warning: These commands are subject to change and the usage may not be accurate by the time you are reading this.*
 
+Commands available:
+* [help](#help)
+* [help \[command\]](#help-command)
+* [uptime](#uptime)
+* [info](#info)
+* [shutdown](#shutdown)
+* [prefix](#prefix)
+* [setprefix \[prefix\]](#setprefix-prefix)
+* [addclass \[@class\] \[names\]](#addclass-class-names)
+* [removeclass \[@class\]](#removeclass-class)
+* [classes](#classes)
+* [remainingstudents \[@class\]](#remainingstudents-class)
+* [checkupdate \[upstream\]](#checkupdate-upstream)
+* [update \[upstream\]](#update-upstream)
+* [draw \[amount\] \[item\]](#draw-amount-item)
+
 ### `help`
 A list of all the available commands, prefixed with the current prefix. If this is invoked from a server, the bot will send a direct message to you with the commands (if you have direct messages enabled).
 
@@ -49,8 +65,9 @@ The current prefix of the bot. Also displays how to use the bot.
 | ------------------------------------ |
 | ![](https://i.imgur.com/du0qbWs.png) |
 
-### `setprefix`
+### `setprefix [prefix]`
 Set the prefix of the bot.
+`prefix` is the new prefix.
 
 | Example usage                        |
 | ------------------------------------ |
