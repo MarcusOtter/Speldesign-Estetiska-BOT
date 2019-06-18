@@ -17,7 +17,7 @@ Has the ability to update itself when there are new commits in this repo. The sc
 ## Commands
 ![Bot banner](https://i.imgur.com/qSIetxq.png)
 
-The bot currently has `13` working commands. There are many more features planned, some of which can be found [here](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement).
+The bot currently has `14` commands. There are many more features planned, some of which can be found [here](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement).
 
 *:warning: These commands are subject to change and the usage may not be accurate by the time you are reading this.*
 
