@@ -106,7 +106,7 @@ A list of students from a class that have not joined the discord server yet.<br>
 | *In server*<br>![](https://i.imgur.com/Em23RUG.png)<br>*In DMs*<br>![](https://i.imgur.com/uW3tPe9.png) |
 
 ### `checkupdate [upstream]`
-Check if there is an update available from the specified upstream.
+Check if there is an update available from the specified upstream.<br>
 `upstream` is an optional parameter that defaults to origin/master. This is the branch that should be checked against.<br>
 
 ### `update [upstream]`
