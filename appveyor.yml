@@ -17,12 +17,9 @@ test_script:
 - ps: >-
     nuget install OpenCover -OutputDirectory packages -Version 4.6.519
 
-    .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test SpeldesignBotCore.xUnit.Tests/SpeldesignBotCore.xUnit.Tests.csproj" -oldstyle -output:"opencoverCoverage.xml"
+    .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test SpeldesignBotCore.xUnit.Tests/SpeldesignBotCore.xUnit.Tests.csproj" -filter:"+[SpeldesignBotCore*]* -[SpeldesignBotCore*]*Tests.*" -oldstyle -output:"opencoverCoverage.xml"
 
     codecov -f "opencoverCoverage.xml"
-    
-    # Needed to make the CI Build fail, because OpenCover doesn't seem to fail the build even if the unit tests fail
-    dotnet test SpeldesignBotCore.xUnit.Tests/SpeldesignBotCore.xUnit.Tests.csproj
 on_success:
   - ps: Invoke-RestMethod https://raw.githubusercontent.com/DiscordHooks/appveyor-discord-webhook/master/send.ps1 -o send.ps1
   - ps: ./send.ps1 success $env:WEBHOOK_URL
