@@ -8,6 +8,7 @@
         public string Password;
         public string WorldName;
 
+        // Todo: remove this ctor
         public MinecraftServerConfig(string host, int port, string username, string password, string worldName)
         {
             Host = host;

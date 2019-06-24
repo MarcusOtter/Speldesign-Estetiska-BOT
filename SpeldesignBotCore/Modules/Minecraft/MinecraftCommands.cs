@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using SpeldesignBotCore.Modules.Minecraft.Entities;
+using SpeldesignBotCore.Modules.Minecraft.Helpers;
 
 namespace SpeldesignBotCore.Modules.Minecraft
 {
@@ -23,10 +25,24 @@ namespace SpeldesignBotCore.Modules.Minecraft
             await ReplyAsync("Made new ftp client config.");
         }
 
-        [Command("mc dir")]
-        public async Task GetDirectories()
+        [Command("mc players")]
+        public async Task ListPlayers()
         {
-            await ReplyAsync(_serverDataProvider.GetDirectoryNames());
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle("__Players on the minecraft server__")
+                .WithDescription("*These are the players that have logged in at least once in the past month on the SPE16 minecraft server.*")
+                .WithThumbnailUrl("https://gamepedia.cursecdn.com/minecraft_gamepedia/thumb/c/c7/Grass_Block.png/150px-Grass_Block.png?version=d571898fb2d2fbc625bd3faaa060b256")
+                .WithColor(118, 196, 177);
+
+            foreach (var user in _serverDataProvider.GetCachedMinecraftUsers().OrderByDescending(x => x.ExpiresOn))
+            {
+                var expirationDate = user.ExpiresOn.ToDateTime();
+                var utcOffset = user.ExpiresOn.GetUtcOffset();
+                TimeSpan lastLogin = DateTime.UtcNow.AddHours(utcOffset) - expirationDate.AddMonths(-1);
+                embedBuilder.AddField(user.Name, $"Last login {lastLogin.ToPrettyString()} ago.", inline: true);
+            }
+
+            await ReplyAsync("", embed: embedBuilder.Build());
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using FluentFTP;
+using Newtonsoft.Json;
 using SpeldesignBotCore.Modules.Minecraft.Entities;
 using SpeldesignBotCore.Storage;
 
@@ -22,17 +24,12 @@ namespace SpeldesignBotCore.Modules.Minecraft
             _ftpClient = GetConnectedFtpClient();
         }
 
-        // Temp to test the ftp connection
-        public string GetDirectoryNames()
+        public CachedMinecraftUser[] GetCachedMinecraftUsers()
         {
-            string result = string.Empty;
+            var userCacheStream = GetConnectedFtpClient().OpenRead("/usercache.json");
+            var userCacheStreamReader = new StreamReader(userCacheStream);
 
-            foreach (var listing in GetConnectedFtpClient().GetListing())
-            {
-                result += listing.FullName + Environment.NewLine;
-            }
-
-            return $"Here are the directories:{Environment.NewLine}{result}";
+            return JsonConvert.DeserializeObject<CachedMinecraftUser[]>(userCacheStreamReader.ReadToEnd());
         }
 
         private MinecraftServerConfig GetMinecraftServerConfig()
