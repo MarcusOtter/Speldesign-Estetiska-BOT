@@ -4,7 +4,7 @@ Speldesign Estetiska BOT
 | ---- | :----: |
 | ![Speldesign estetiska BOT logo](https://images-ext-1.discordapp.net/external/_vHG8tWTHiVQWEugTxxvcR1BY-370reLXVgFw8CX9Mg/%3Fsize%3D64/https/cdn.discordapp.com/avatars/473916590732214272/39b2494dd3b7bcf578ccdc41284ee2f9.png) | A discord bot made with .NET Core and :coffee: for game design students from [![Uppsala estetiska gymnasium logo](https://i.imgur.com/ZrpBl85.png "Uppsala kommun") Uppsala estetiska gymnasium](https://estetiska.uppsala.se/blielev/speldesign/).<br>Currently being hosted on a Raspberry Pi 3 (named LadyBug :beetle:) running Raspbian GNU/Linux 9 (stretch). |
 
-| Active | Inactive (see [#55](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/issues/55)) |
+| Build status | Code coverage |
 | ------ | -------- |
 | [![Build status](https://ci.appveyor.com/api/projects/status/7u45ojhicarcph72?svg=true)](https://ci.appveyor.com/project/LeMorrow/speldesign-estetiska-bot) | [![codecov](https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT/branch/master/graph/badge.svg)](https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT) |
 ## Auto-deployment
