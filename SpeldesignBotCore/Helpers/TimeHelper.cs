@@ -8,7 +8,7 @@ namespace SpeldesignBotCore
         /// <summary> Formats the timespan as "A days B hours C minutes D seconds" with proper pluralization. </summary>
         public static string ToPrettyString(this TimeSpan span)
         {
-            if (span == TimeSpan.Zero || span.Seconds == 0) { return "0 seconds"; }
+            if (span == TimeSpan.Zero) { return "0 seconds"; }
 
             var builder = new StringBuilder();
 
@@ -16,8 +16,11 @@ namespace SpeldesignBotCore
             if (span.Hours > 0)   { builder.Append($"{span.Hours} hour{    (span.Hours > 1   ? "s" : string.Empty)} "); }
             if (span.Minutes > 0) { builder.Append($"{span.Minutes} minute{(span.Minutes > 1 ? "s" : string.Empty)} "); }
             if (span.Seconds > 0) { builder.Append($"{span.Seconds} second{(span.Seconds > 1 ? "s" : string.Empty)} "); }
+            
+            var result = builder.ToString().Trim();
+            if (string.IsNullOrEmpty(result)) { result = "0 seconds"; }
 
-            return builder.ToString().Trim();
+            return result;
         }
     }
 }

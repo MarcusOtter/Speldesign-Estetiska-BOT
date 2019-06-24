@@ -9,16 +9,15 @@ dotnet_csproj:
 install:
   - dotnet --version
 before_build:
+  - nuget restore
   - choco install codecov
 build_script:
   - dotnet build -c Release
 test_script:
 - ps: >-
-    nuget install xunit.runner.console -OutputDirectory packages -Version 2.3.1
-
     nuget install OpenCover -OutputDirectory packages -Version 4.6.519
 
-    .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" "-targetargs:"".\packages\xunit.runner.console.2.3.1\tools\netcoreapp2.0\xunit.console.dll"" ""SpeldesignBotCore.xUnit.Tests\bin\Release\netcoreapp2.1\SpeldesignBotCore.xUnit.Tests.dll"" -noshadow -appveyor" -filter:"+[SpeldesignBotCore*]* -[SpeldesignBotCore*]*Tests.*" -oldStyle -output:"opencoverCoverage.xml"
+    .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test SpeldesignBotCore.xUnit.Tests/SpeldesignBotCore.xUnit.Tests.csproj" -oldstyle -output:"opencoverCoverage.xml"
 
     codecov -f "opencoverCoverage.xml"
     
