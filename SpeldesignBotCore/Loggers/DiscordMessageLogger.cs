@@ -21,6 +21,8 @@ namespace SpeldesignBotCore.Loggers
 
         public async Task LogMessageSent(SocketMessage message, SocketGuild guild)
         {
+            if (_logChannel is null) { return; }
+
             var embedBuilder = new EmbedBuilder()
                 .WithAuthor(GetPrettyAuthorName(message.Author))
                 .WithThumbnailUrl(message.Author.GetAvatarUrl(size: 32))
@@ -34,6 +36,8 @@ namespace SpeldesignBotCore.Loggers
 
         public async Task LogMessageEdited(SocketMessage messageBefore, SocketMessage messageAfter, SocketGuild guild)
         {
+            if (_logChannel is null) { return; }
+
             var embedBuilder = new EmbedBuilder()
                 .WithAuthor(GetPrettyAuthorName(messageAfter.Author))
                 .WithThumbnailUrl(messageAfter.Author.GetAvatarUrl(size: 32))
