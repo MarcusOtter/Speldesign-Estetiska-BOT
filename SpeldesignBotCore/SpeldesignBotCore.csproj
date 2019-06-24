@@ -12,8 +12,9 @@
     <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.0.0-beta"/>
-    <PackageReference Include="Unity" Version="5.8.6"/>
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0"/>
+    <PackageReference Include="Discord.Net" Version="2.0.0-beta" />
+    <PackageReference Include="Unity" Version="5.8.6" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0" />
+    <PackageReference Include="FluentFTP" Version="25.0.3" />
   </ItemGroup>
 </Project>
