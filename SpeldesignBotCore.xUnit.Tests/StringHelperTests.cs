@@ -114,8 +114,8 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void StringHelper_FindClosestMatch_MaxDistanceTest1()
         {
-            string[] possibleOutputs = new string[] { "Marcus Otterström", "Samuel Lundberg", "Other Name" };
-            const string input = "marcus otterströmm"; // 3 distance
+            string[] possibleOutputs = new string[] { "Marcus Otterstrï¿½m", "Samuel Lundberg", "Other Name" };
+            const string input = "marcus otterstrï¿½mm"; // 3 distance
             string[] expected = new string[0];
 
             var actual = possibleOutputs.FindClosestMatch(input, maxDistance: 2);
@@ -126,9 +126,9 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void StringHelper_FindClosestMatch_MaxDistanceTest2()
         {
-            string[] possibleOutputs = new string[] { "Marcus Otterström", "Samuel Lundberg", "Other Name" };
-            const string input = "marcus otterströmm"; // 3 distance
-            string[] expected = new string[] { "Marcus Otterström" };
+            string[] possibleOutputs = new string[] { "Marcus Otterstrï¿½m", "Samuel Lundberg", "Other Name" };
+            const string input = "marcus otterstrï¿½mm"; // 3 distance
+            string[] expected = new string[] { "Marcus Otterstrï¿½m" };
 
             var actual = possibleOutputs.FindClosestMatch(input, maxDistance: 3);
 
