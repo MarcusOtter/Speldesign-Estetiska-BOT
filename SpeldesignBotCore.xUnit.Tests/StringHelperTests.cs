@@ -45,7 +45,7 @@ namespace SpeldesignBotCore.xUnit.Tests
             const string inputA = "912345";
             const string inputB = "1234";
 
-            const int expected = 2;
+            const int expected = 5; // temporary failing test. should be 2.
             var actual = inputA.LevenshteinDistance(inputB);
 
             Assert.Equal(expected, actual);
