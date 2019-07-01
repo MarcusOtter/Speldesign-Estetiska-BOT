@@ -17,7 +17,7 @@ test_script:
 - ps: >-
     nuget install OpenCover -OutputDirectory packages -Version 4.6.519
 
-    .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test SpeldesignBotCore.xUnit.Tests/SpeldesignBotCore.xUnit.Tests.csproj" -filter:"+[SpeldesignBotCore*]* -[SpeldesignBotCore*]*Tests.*" -oldstyle -output:"opencoverCoverage.xml"
+    .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test SpeldesignBotCore.xUnit.Tests/SpeldesignBotCore.xUnit.Tests.csproj" -filter:"+[SpeldesignBotCore*]* -[SpeldesignBotCore*]*Tests.*" -oldstyle -returntargetcode -output:"opencoverCoverage.xml"
     
     if($LastExitCode -ne 0){
       Write-Error -Message "xUnit failed" -ErrorAction Stop
