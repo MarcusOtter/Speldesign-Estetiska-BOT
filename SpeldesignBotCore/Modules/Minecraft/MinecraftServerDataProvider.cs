@@ -75,7 +75,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
             // Not super clean, I'm sure there's a better way to do this
             var players = await GetMinecraftPlayersAsync();
             players = players
-                .Where(x => x.Stats[actionName][itemName] != null)
+                .Where(x => x.Stats[actionName] != null && x.Stats[actionName][itemName] != null)
                 .OrderByDescending(x => (int) x.Stats[actionName][itemName])
                 .Take(playersToReturnAmount)
                 .ToArray();
