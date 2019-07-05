@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using SpeldesignBotCore.Modules.Minecraft.Entities;
 
 namespace SpeldesignBotCore.Modules.Minecraft.Helpers
 {
@@ -21,10 +20,7 @@ namespace SpeldesignBotCore.Modules.Minecraft.Helpers
                 .Replace(")",  string.Empty);
         }
 
-        public static string ToReadableString(this MinecraftItem item) =>                  item     .ToString().ToReadableString();
-        public static string ToReadableString(this MinecraftMob mob) =>                    mob      .ToString().ToReadableString();
-        public static string ToReadableString(this MinecraftStatisticAction action) =>     action   .ToString().ToReadableString();
-        public static string ToReadableString(this MinecraftGeneralStatistic statistic) => statistic.ToString().ToReadableString();
+        public static string ToReadableString<TEnum>(this TEnum minecraftItem) => minecraftItem.ToString().ToReadableString();
 
         /// <summary> Turns a string like "MossyCobblestoneSlab" to "mossy cobblestone slab" </summary>
         private static string ToReadableString(this string input)
@@ -52,10 +48,7 @@ namespace SpeldesignBotCore.Modules.Minecraft.Helpers
             return builder.ToString();
         }
 
-        public static string ToMinecraftJsonString(this MinecraftItem item) =>                  item     .ToString().ToMinecraftJsonString();
-        public static string ToMinecraftJsonString(this MinecraftMob mob) =>                    mob      .ToString().ToMinecraftJsonString();
-        public static string ToMinecraftJsonString(this MinecraftStatisticAction action) =>     action   .ToString().ToMinecraftJsonString();
-        public static string ToMinecraftJsonString(this MinecraftGeneralStatistic statistic) => statistic.ToString().ToMinecraftJsonString();
+        public static string ToMinecraftJsonString<TEnum>(this TEnum minecraftItem) => minecraftItem.ToString().ToMinecraftJsonString();
 
         /// <summary> Turns a string like "MossyCobblestoneSlab" to "minecraft:mossy_cobblestone_slab"</summary>
         private static string ToMinecraftJsonString(this string input)
