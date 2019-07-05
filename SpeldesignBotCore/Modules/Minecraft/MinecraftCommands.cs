@@ -80,7 +80,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
                     var errorEmbedBuilder = new EmbedBuilder()
                         .WithTitle($"Most {item.ToReadableString()} {action.ToReadableString()}")
                         .WithDescription($"There are no players that have {action.ToReadableString()} {item.ToReadableString()}.")
-                        .WithFooter("It's possible that the item ID's are hooked up wrong. Ping @LeMorrow#8192 if you think it's borked!")
+                        .WithFooter("The item ID's might be hooked up wrong. Ping @LeMorrow#8192 if you think it's borked!")
                         .WithColor(255, 79, 79);
 
                     await ReplyAsync("", embed: errorEmbedBuilder.Build());

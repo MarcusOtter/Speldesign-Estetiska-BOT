@@ -40,39 +40,6 @@ namespace SpeldesignBotCore.xUnit.Tests
         }
 
         [Fact]
-        public void MinecraftStringHelper_ToMinecraftJsonString_CorrectOutputForStringTest1()
-        {
-            const string input = "GoldenHorseArmor";
-            const string expected = "minecraft:golden_horse_armor";
-
-            var actual = input.ToMinecraftJsonString();
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void MinecraftStringHelper_ToMinecraftJsonString_CorrectOutputForStringTest2()
-        {
-            const string input = "MossyStoneBrickMonsterEgg";
-            const string expected = "minecraft:mossy_stone_brick_monster_egg";
-
-            var actual = input.ToMinecraftJsonString();
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void MinecraftStringHelper_ToMinecraftJsonString_CorrectOutputForStringTest3()
-        {
-            const string input = "Potato";
-            const string expected = "minecraft:potato";
-
-            var actual = input.ToMinecraftJsonString();
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
         public void MinecraftStringHelper_ToMinecraftJsonString_CorrectOutputForItemTest()
         {
             const MinecraftItem input1 = MinecraftItem.MagmaCream;
