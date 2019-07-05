@@ -65,21 +65,72 @@ namespace SpeldesignBotCore.Modules.Minecraft
             }
 
             [Command]
-            public async Task Most(string args)
+            public async Task Most(string entityString, string actionString)
             {
-                await ReplyAsync($"Args: {args}");
+                entityString = entityString.ToEnumString();
+                actionString = actionString.ToEnumString();
+
+                var actionIsValid = EnumHelper.FindSimilarAndTryParse(actionString, out MinecraftStatisticAction action);
+                if (!actionIsValid)
+                {
+                    var closestMatches = Enum.GetNames(typeof(MinecraftStatisticAction)).FindClosestMatch(actionString).Take(5).ToArray();
+                    await SendNotFoundErrorAsync($"__Could not find action \"{actionString}\"__", closestMatches);
+                    return;
+                }
+
+                // If the action is Killed the entityString is a mob, not an item.
+                if (action is MinecraftStatisticAction.Killed)
+                {
+                    var mobIsValid = EnumHelper.FindSimilarAndTryParse(entityString, out MinecraftMob mob);
+
+                    if (!mobIsValid)
+                    {
+                        var closestMatches = Enum.GetNames(typeof(MinecraftItem)).FindClosestMatch(entityString).Take(5).ToArray();
+                        await SendNotFoundErrorAsync($"__Could not find mob \"{entityString}\"__", closestMatches);
+                        return;
+                    }
+
+                    await SendMostMessageAsync(mob, action);
+                }
+                else
+                {
+                    var itemIsValid = EnumHelper.FindSimilarAndTryParse(entityString, out MinecraftItem item);
+
+                    if (!itemIsValid)
+                    {
+                        var closestMatches = Enum.GetNames(typeof(MinecraftItem)).FindClosestMatch(entityString).Take(5).ToArray();
+                        await SendNotFoundErrorAsync($"__Could not find item \"{entityString}\"__", closestMatches);
+                        return;
+                    }
+
+                    await SendMostMessageAsync(item, action);
+                }
             }
 
-            [Command]
-            public async Task Most(MinecraftItem item, MinecraftStatisticAction action)
+            private async Task SendNotFoundErrorAsync(string title, string[] closeMatches)
             {
-                var playerScores = await _serverDataProvider.GetPlayersWithMostInStatisticAsync(item, action);
+                var embedBuilder = new EmbedBuilder()
+                    .WithTitle(title)
+                    .WithColor(255, 79, 79)
+                    .WithDescription(closeMatches.Length == 1
+                        ? $"Did you mean `{closeMatches[0]}`?"
+                        : $"Did you mean one of these?\n`{string.Join("`\n`", closeMatches)}`");
+
+                await ReplyAsync("", embed: embedBuilder.Build());
+            }
+
+            public async Task SendMostMessageAsync<TEnum>(TEnum entity, MinecraftStatisticAction action)
+            {
+                var playerScores = await _serverDataProvider.GetPlayersWithMostInStatisticAsync(entity, action);
+
+                string readableEntityName = entity.ToReadableString();
+                string readableActionName = action.ToReadableString();
 
                 if (playerScores.Length == 0)
                 {
                     var errorEmbedBuilder = new EmbedBuilder()
-                        .WithTitle($"Most {item.ToReadableString()} {action.ToReadableString()}")
-                        .WithDescription($"There are no players that have {action.ToReadableString()} {item.ToReadableString()}.")
+                        .WithTitle($"Most {readableEntityName} {readableActionName}")
+                        .WithDescription($"There are no players that have {readableActionName} {readableEntityName}.")
                         .WithFooter("The item ID's might be hooked up wrong. Ping @LeMorrow#8192 if you think it's borked!")
                         .WithColor(255, 79, 79);
 
@@ -90,105 +141,16 @@ namespace SpeldesignBotCore.Modules.Minecraft
                 var stringBuilder = new StringBuilder();
                 for (int i = 0; i < playerScores.Length; i++)
                 {
-                    stringBuilder.AppendLine($"{i + 1}. **{playerScores[i].player.Name}** has {action.ToReadableString()} **{playerScores[i].score}** {item.ToReadableString()}.");
+                    // Ext method for this string depending on action?
+                    stringBuilder.AppendLine($"{i + 1}. **{playerScores[i].player.Name}** has {readableActionName} **{playerScores[i].amount}** {readableEntityName}.");
                 }
 
                 var embedBuilder = new EmbedBuilder()
-                    .WithTitle($"Most {item.ToReadableString()} {action.ToReadableString()}")
+                    .WithTitle($"Most {readableEntityName} {readableActionName}")
                     .WithDescription(stringBuilder.ToString())
                     .WithColor(118, 196, 177);
 
                 await ReplyAsync("", embed: embedBuilder.Build());
-            }
-
-            [Command]
-            public async Task Most(string itemString, string actionString)
-            {
-                itemString = itemString.ToEnumString();
-                actionString = actionString.ToEnumString();
-
-                Enum.TryParse(itemString,   ignoreCase: true, out MinecraftItem item);
-                Enum.TryParse(actionString, ignoreCase: true, out MinecraftStatisticAction action);
-
-                if (item != MinecraftItem.Invalid && action != MinecraftStatisticAction.Invalid)
-                {
-                    await Most(item, action);
-                    return;
-                }
-
-                // TODO: Refactor this whole command into reusable methods.
-
-                // Also check if the action is killed, then check for mobs instead of items
-
-                // And if no action is present, make the action = Custom
-
-
-
-
-                var embedBuilder = new EmbedBuilder();
-
-                if (item is MinecraftItem.Invalid)
-                {
-                    var allItemNames = Enum.GetNames(typeof(MinecraftItem));
-                    var closeMatch = allItemNames.FindClosestMatch(itemString, maxDistance: 5).FirstOrDefault();
-
-                    // If there is a close match to the item name, use that item.
-                    if (closeMatch != null)
-                    {
-                        item = (MinecraftItem) Enum.Parse(typeof(MinecraftItem), closeMatch);
-                    }
-                    else
-                    {
-                        var closeMatches = allItemNames.FindClosestMatch(itemString);
-                        // Limit to 5 items
-                        if (closeMatches.Length > 5) { closeMatches = closeMatches.Take(5).ToArray(); }
-
-                        embedBuilder
-                            .WithTitle($"__Could not find item {itemString}__")
-                            .WithColor(255, 79, 79)
-                            .WithDescription(closeMatches.Length == 1
-                                ? $"Did you mean `{closeMatches[0]}`?"
-                                : $"Did you mean one of these items?\n`{string.Join("`\n`", closeMatches)}`");
-
-                        await ReplyAsync("", embed: embedBuilder.Build());
-                        return;
-                    }
-
-                }
-
-                if (action is MinecraftStatisticAction.Invalid)
-                {
-                    var allActionNames = Enum.GetNames(typeof(MinecraftStatisticAction));
-                    var closeMatch = allActionNames.FindClosestMatch(actionString, maxDistance: 3).FirstOrDefault();
-
-                    // If there is a close match to the item name, use that item.
-                    if (closeMatch != null)
-                    {
-                        action = (MinecraftStatisticAction) Enum.Parse(typeof(MinecraftStatisticAction), closeMatch);
-                    }
-                    else
-                    {
-                        var closeMatches = allActionNames.FindClosestMatch(itemString);
-                        // Limit to 5 items
-                        if (closeMatches.Length > 5) { closeMatches = closeMatches.Take(5).ToArray(); }
-
-                        embedBuilder
-                            .WithTitle($"__Could not find action {actionString}__")
-                            .WithColor(255, 79, 79)
-                            .WithDescription(closeMatches.Length == 1
-                                ? $"Did you mean `{closeMatches[0]}`?"
-                                : $"Did you mean one of these actions?\n`{string.Join("`\n`", closeMatches)}`");
-
-                        await ReplyAsync("", embed: embedBuilder.Build());
-                        return;
-                    }
-                }
-
-                await Most(item, action);
-
-                //var embedBuilder = new EmbedBuilder();
-
-                //if ()
             }
         }
     }
