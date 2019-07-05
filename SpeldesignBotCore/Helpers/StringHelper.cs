@@ -21,7 +21,6 @@ namespace SpeldesignBotCore
 
         /// <summary>
         /// Returns the closest matching string(s) using the levenshtein distance method.
-        /// WARNING: This function can take a very long time.
         /// </summary>
         /// <returns>
         /// The closest matching string(s) using the levenshtein distance method.
