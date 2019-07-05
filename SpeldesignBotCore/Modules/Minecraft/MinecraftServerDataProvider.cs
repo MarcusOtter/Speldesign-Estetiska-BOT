@@ -55,28 +55,17 @@ namespace SpeldesignBotCore.Modules.Minecraft
             return _minecraftPlayers;
         }
 
-        //public CachedMinecraftUser[] GetCachedMinecraftUsers()
-        //{
-        //    var ftpClient = GetConnectedFtpClient();
-
-        //    var userCacheStream = ftpClient.OpenRead("/usercache.json");
-        //    ftpClient.GetReply();
-
-        //    var userCacheStreamReader = new StreamReader(userCacheStream);
-
-        //    return JsonConvert.DeserializeObject<CachedMinecraftUser[]>(userCacheStreamReader.ReadToEnd());
-        //}
-
-        public async Task<(MinecraftPlayer player, int score)[]> GetPlayersWithMostInStatisticAsync(MinecraftItem item, MinecraftStatisticAction action, int playersToReturnAmount = 5)
+        public async Task<(MinecraftPlayer player, int amount)[]> GetPlayersWithMostInStatisticAsync<TEnum>(TEnum entity, MinecraftStatisticAction action, int playersToReturnAmount = 5)
         {
-            var itemName = item.ToMinecraftJsonString();
+            var entityName = entity.ToMinecraftJsonString();
             var actionName = action.ToMinecraftJsonString();
 
-            // Not super clean, I'm sure there's a better way to do this
+            // Not super clean, I'm sure there's a better way to create these tuples below
+
             var players = await GetMinecraftPlayersAsync();
             players = players
-                .Where(x => x.Stats[actionName] != null && x.Stats[actionName][itemName] != null)
-                .OrderByDescending(x => (int) x.Stats[actionName][itemName])
+                .Where(x => x.Stats[actionName] != null && x.Stats[actionName][entityName] != null)
+                .OrderByDescending(x => (int) x.Stats[actionName][entityName])
                 .Take(playersToReturnAmount)
                 .ToArray();
 
@@ -84,15 +73,10 @@ namespace SpeldesignBotCore.Modules.Minecraft
             for (int i = 0; i < result.Length; i++)
             {
                 var player = players[i];
-                result[i] = (player, (int) player.Stats[actionName][itemName]);
+                result[i] = (player, (int) player.Stats[actionName][entityName]);
             }
 
             return result;
-            //return players
-            //    .Where(x => x.Stats[actionName][itemName] != null)
-            //    .OrderByDescending(x => (int) x.Stats[actionName][itemName])
-            //    .Take(playersToReturnAmount)
-            //    .ToArray();
         }
 
         private async Task<dynamic> GetStatisticsForPlayerAsync(string playerUuid)
