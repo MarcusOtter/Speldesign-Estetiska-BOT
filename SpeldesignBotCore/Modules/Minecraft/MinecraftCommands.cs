@@ -74,7 +74,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
                 if (!actionIsValid)
                 {
                     var closestMatches = Enum.GetNames(typeof(MinecraftStatisticAction)).FindClosestMatch(actionString).Take(5).ToArray();
-                    await SendNotFoundErrorAsync($"__Could not find action \"{actionString}\"__", closestMatches);
+                    await SendNotFoundErrorAsync($"__Could not find action \"{actionString.ToReadableString()}\"__", closestMatches);
                     return;
                 }
 
@@ -86,7 +86,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
                     if (!mobIsValid)
                     {
                         var closestMatches = Enum.GetNames(typeof(MinecraftItem)).FindClosestMatch(entityString).Take(5).ToArray();
-                        await SendNotFoundErrorAsync($"__Could not find mob \"{entityString}\"__", closestMatches);
+                        await SendNotFoundErrorAsync($"__Could not find mob \"{entityString.ToReadableString()}\"__", closestMatches);
                         return;
                     }
 
@@ -99,7 +99,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
                     if (!itemIsValid)
                     {
                         var closestMatches = Enum.GetNames(typeof(MinecraftItem)).FindClosestMatch(entityString).Take(5).ToArray();
-                        await SendNotFoundErrorAsync($"__Could not find item \"{entityString}\"__", closestMatches);
+                        await SendNotFoundErrorAsync($"__Could not find item \"{entityString.ToReadableString()}\"__", closestMatches);
                         return;
                     }
 
@@ -113,8 +113,8 @@ namespace SpeldesignBotCore.Modules.Minecraft
                     .WithTitle(title)
                     .WithColor(255, 79, 79)
                     .WithDescription(closeMatches.Length == 1
-                        ? $"Did you mean `{closeMatches[0]}`?"
-                        : $"Did you mean one of these?\n`{string.Join("`\n`", closeMatches)}`");
+                        ? $"Did you mean `{closeMatches[0].ToReadableString()}`?"
+                        : $"Did you mean one of these?\n`{string.Join("`\n`", closeMatches.Select(x => x.ToReadableString()))}`");
 
                 await ReplyAsync("", embed: embedBuilder.Build());
             }
