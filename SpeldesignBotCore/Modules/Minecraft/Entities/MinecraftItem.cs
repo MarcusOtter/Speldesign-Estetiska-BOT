@@ -228,7 +228,7 @@
         DarkPrismarine,
         DarkPrismarineSlab,
         DarkPrismarineStairs,
-        DaylightSensor,
+        DaylightDetector,
         DeadBlueCoral,
         DeadBlueCoralFan,
         DeadBlueCoralPlant,
