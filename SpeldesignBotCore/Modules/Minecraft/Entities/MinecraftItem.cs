@@ -882,7 +882,7 @@
         SweetBerries,
         Tnt,
         Torch,
-        TotemUndying,
+        TotemOfUndying,
         TrappedChest,
         Trident,
         TripwireHook,
