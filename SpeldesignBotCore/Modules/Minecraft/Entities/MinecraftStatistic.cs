@@ -1,6 +1,6 @@
 ﻿namespace SpeldesignBotCore.Modules.Minecraft.Entities
 {
-    public enum MinecraftGeneralStatistic
+    public enum MinecraftStatistic
     {
         Invalid = 0,
         DistanceFallen,

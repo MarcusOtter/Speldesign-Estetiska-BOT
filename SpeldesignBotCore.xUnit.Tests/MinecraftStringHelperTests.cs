@@ -75,7 +75,7 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void MinecraftStringHelper_ToMinecraftJsonString_CorrectOutputForStatisticTest()
         {
-            const MinecraftGeneralStatistic input1 = MinecraftGeneralStatistic.MobKills;
+            const MinecraftStatistic input1 = MinecraftStatistic.MobKills;
             const string expected = "minecraft:mob_kills";
 
             var actual = input1.ToMinecraftJsonString();
