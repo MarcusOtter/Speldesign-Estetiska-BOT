@@ -10,6 +10,7 @@
         Mined,
         Custom,
         Used,
-        Killed
+        Killed,
+        KilledBy
     }
 }

@@ -78,8 +78,8 @@ namespace SpeldesignBotCore.Modules.Minecraft
                     return;
                 }
 
-                // If the action is Killed the entityString is a mob, not an item.
-                if (action is MinecraftStatisticAction.Killed)
+                // If the action is Killed or KilledBy the entityString is a mob, not an item.
+                if (action is MinecraftStatisticAction.Killed || action is MinecraftStatisticAction.KilledBy)
                 {
                     var mobIsValid = EnumHelper.FindSimilarAndTryParse(entityString, out MinecraftMob mob);
 
