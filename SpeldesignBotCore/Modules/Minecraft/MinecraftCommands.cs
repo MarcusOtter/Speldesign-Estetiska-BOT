@@ -123,13 +123,14 @@ namespace SpeldesignBotCore.Modules.Minecraft
             {
                 var playerScores = await _serverDataProvider.GetPlayersWithMostInStatisticAsync(entity, action);
 
+                // To be removed
                 string readableEntityName = entity.ToReadableString();
                 string readableActionName = action.ToReadableString();
 
                 if (playerScores.Length == 0)
                 {
                     var errorEmbedBuilder = new EmbedBuilder()
-                        .WithTitle($"Most {readableEntityName} {readableActionName}")
+                        .WithTitle(GetEmbedTitleForAction(action, entity))
                         .WithDescription($"There are no players that have {readableActionName} {readableEntityName}.")
                         .WithFooter("The item ID's might be hooked up wrong. Ping @LeMorrow#8192 if you think it's borked!")
                         .WithColor(255, 79, 79);
@@ -141,16 +142,39 @@ namespace SpeldesignBotCore.Modules.Minecraft
                 var stringBuilder = new StringBuilder();
                 for (int i = 0; i < playerScores.Length; i++)
                 {
-                    // Ext method for this string depending on action?
-                    stringBuilder.AppendLine($"{i + 1}. **{playerScores[i].player.Name}** has {readableActionName} **{playerScores[i].amount}** {readableEntityName}.");
+                    var statisticString = GetStatisticStringForAction(action, entity, playerScores[i].player.Name, playerScores[i].amount);
+                    stringBuilder.AppendLine($"{i + 1}. {statisticString}");
                 }
 
                 var embedBuilder = new EmbedBuilder()
-                    .WithTitle($"Most {readableEntityName} {readableActionName}")
+                    .WithTitle(GetEmbedTitleForAction(action, entity))
                     .WithDescription(stringBuilder.ToString())
                     .WithColor(118, 196, 177);
 
                 await ReplyAsync("", embed: embedBuilder.Build());
+            }
+
+            private string GetEmbedTitleForAction<TEnum>(MinecraftStatisticAction action, TEnum entity)
+            {
+                switch (action)
+                {
+                    default:                                return $"Most {entity.ToReadableString()} {action.ToReadableString()}";
+
+                    case MinecraftStatisticAction.Used:     return $"Most times {entity.ToReadableString()} {action.ToReadableString()}";
+                    case MinecraftStatisticAction.KilledBy: return $"Most times {action.ToReadableString()} {entity.ToReadableString()}";
+                    case MinecraftStatisticAction.Custom:   return $"Most {entity.ToReadableString()}";
+                }
+            }
+
+            private string GetStatisticStringForAction<TEnum>(MinecraftStatisticAction action, TEnum entity, string username, int amount)
+            {
+                switch (action)
+                {
+                    default:                                return $"**{username}** has {action.ToReadableString()} **{amount}** {entity.ToReadableString()}.";
+
+                    case MinecraftStatisticAction.Used:     return $"**{username}** has {action.ToReadableString()} {entity.ToReadableString()} **{amount}** time(s).";
+                    case MinecraftStatisticAction.KilledBy: return $"**{username}** has been {action.ToReadableString()} {entity.ToReadableString()} **{amount}** time(s).";
+                }
             }
         }
     }
