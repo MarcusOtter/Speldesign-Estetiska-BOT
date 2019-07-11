@@ -70,16 +70,16 @@ namespace SpeldesignBotCore.Modules.Minecraft
                 entityString = entityString.ToEnumString();
                 actionString = actionString.ToEnumString();
 
-                var actionIsValid = EnumHelper.FindSimilarAndTryParse(actionString, out MinecraftStatisticAction action);
+                var actionIsValid = EnumHelper.FindSimilarAndTryParse(actionString, out MinecraftAction action);
                 if (!actionIsValid)
                 {
-                    var closestMatches = Enum.GetNames(typeof(MinecraftStatisticAction)).FindClosestMatch(actionString).Take(5).ToArray();
+                    var closestMatches = Enum.GetNames(typeof(MinecraftAction)).FindClosestMatch(actionString).Take(5).ToArray();
                     await SendNotFoundErrorAsync($"__Could not find action \"{actionString.ToReadableString()}\"__", closestMatches);
                     return;
                 }
 
                 // If the action is Killed or KilledBy the entityString is a mob, not an item.
-                if (action is MinecraftStatisticAction.Killed || action is MinecraftStatisticAction.KilledBy)
+                if (action is MinecraftAction.Killed || action is MinecraftAction.KilledBy)
                 {
                     var mobIsValid = EnumHelper.FindSimilarAndTryParse(entityString, out MinecraftMob mob);
 
@@ -119,7 +119,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
                 await ReplyAsync("", embed: embedBuilder.Build());
             }
 
-            public async Task SendMostMessageAsync<TEnum>(TEnum entity, MinecraftStatisticAction action)
+            public async Task SendMostMessageAsync<TEnum>(TEnum entity, MinecraftAction action)
             {
                 var playerScores = await _serverDataProvider.GetPlayersWithMostInStatisticAsync(entity, action);
 
@@ -154,26 +154,26 @@ namespace SpeldesignBotCore.Modules.Minecraft
                 await ReplyAsync("", embed: embedBuilder.Build());
             }
 
-            private string GetEmbedTitleForAction<TEnum>(MinecraftStatisticAction action, TEnum entity)
+            private string GetEmbedTitleForAction<TEnum>(MinecraftAction action, TEnum entity)
             {
                 switch (action)
                 {
                     default:                                return $"Most {entity.ToReadableString()} {action.ToReadableString()}";
 
-                    case MinecraftStatisticAction.Used:     return $"Most times {entity.ToReadableString()} {action.ToReadableString()}";
-                    case MinecraftStatisticAction.KilledBy: return $"Most times {action.ToReadableString()} {entity.ToReadableString()}";
-                    case MinecraftStatisticAction.Custom:   return $"Most {entity.ToReadableString()}";
+                    case MinecraftAction.Used:     return $"Most times {entity.ToReadableString()} {action.ToReadableString()}";
+                    case MinecraftAction.KilledBy: return $"Most times {action.ToReadableString()} {entity.ToReadableString()}";
+                    case MinecraftAction.Custom:   return $"Most {entity.ToReadableString()}";
                 }
             }
 
-            private string GetStatisticStringForAction<TEnum>(MinecraftStatisticAction action, TEnum entity, string username, int amount)
+            private string GetStatisticStringForAction<TEnum>(MinecraftAction action, TEnum entity, string username, int amount)
             {
                 switch (action)
                 {
                     default:                                return $"**{username}** has {action.ToReadableString()} **{amount}** {entity.ToReadableString()}.";
 
-                    case MinecraftStatisticAction.Used:     return $"**{username}** has {action.ToReadableString()} {entity.ToReadableString()} **{amount}** time(s).";
-                    case MinecraftStatisticAction.KilledBy: return $"**{username}** has been {action.ToReadableString()} {entity.ToReadableString()} **{amount}** time(s).";
+                    case MinecraftAction.Used:     return $"**{username}** has {action.ToReadableString()} {entity.ToReadableString()} **{amount}** time(s).";
+                    case MinecraftAction.KilledBy: return $"**{username}** has been {action.ToReadableString()} {entity.ToReadableString()} **{amount}** time(s).";
                 }
             }
         }

@@ -55,7 +55,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
             return _minecraftPlayers;
         }
 
-        public async Task<(MinecraftPlayer player, int amount)[]> GetPlayersWithMostInStatisticAsync<TEnum>(TEnum entity, MinecraftStatisticAction action, int playersToReturnAmount = 5)
+        public async Task<(MinecraftPlayer player, int amount)[]> GetPlayersWithMostInStatisticAsync<TEnum>(TEnum entity, MinecraftAction action, int playersToReturnAmount = 5)
         {
             var entityName = entity.ToMinecraftJsonString();
             var actionName = action.ToMinecraftJsonString();

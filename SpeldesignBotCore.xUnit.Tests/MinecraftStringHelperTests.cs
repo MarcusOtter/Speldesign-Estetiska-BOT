@@ -64,7 +64,7 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void MinecraftStringHelper_ToMinecraftJsonString_CorrectOutputForActionTest()
         {
-            const MinecraftStatisticAction input1 = MinecraftStatisticAction.PickedUp;
+            const MinecraftAction input1 = MinecraftAction.PickedUp;
             const string expected = "minecraft:picked_up";
 
             var actual = input1.ToMinecraftJsonString();
