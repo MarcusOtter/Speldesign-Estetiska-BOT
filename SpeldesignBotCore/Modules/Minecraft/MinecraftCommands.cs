@@ -65,6 +65,22 @@ namespace SpeldesignBotCore.Modules.Minecraft
             }
 
             [Command]
+            public async Task Most(string statisticString)
+            {
+                statisticString = statisticString.ToEnumString();
+
+                var statisticIsValid = EnumHelper.FindSimilarAndTryParse(statisticString, out MinecraftStatistic statistic);
+                if (!statisticIsValid)
+                {
+                    var closestMatches = Enum.GetNames(typeof(MinecraftStatistic)).FindClosestMatch(statisticString).Take(5).ToArray();
+                    await SendNotFoundErrorAsync($"__Could not find statistic \"{statisticIsValid.ToReadableString()}\"__", closestMatches);
+                    return;
+                }
+
+                await SendMostMessageAsync(statistic, MinecraftAction.Custom);
+            }
+
+            [Command]
             public async Task Most(string entityString, string actionString)
             {
                 entityString = entityString.ToEnumString();
@@ -123,16 +139,12 @@ namespace SpeldesignBotCore.Modules.Minecraft
             {
                 var playerScores = await _serverDataProvider.GetPlayersWithMostInStatisticAsync(entity, action);
 
-                // To be removed
-                string readableEntityName = entity.ToReadableString();
-                string readableActionName = action.ToReadableString();
-
                 if (playerScores.Length == 0)
                 {
                     var errorEmbedBuilder = new EmbedBuilder()
                         .WithTitle(GetEmbedTitleForAction(action, entity))
-                        .WithDescription($"There are no players that have {readableActionName} {readableEntityName}.")
-                        .WithFooter("The item ID's might be hooked up wrong. Ping @LeMorrow#8192 if you think it's borked!")
+                        .WithDescription($"There are no players that have done that.")
+                        .WithFooter("The entity ID's might be hooked up wrong. Ping @LeMorrow#8192 if you think it's borked!")
                         .WithColor(255, 79, 79);
 
                     await ReplyAsync("", embed: errorEmbedBuilder.Build());
@@ -158,7 +170,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
             {
                 switch (action)
                 {
-                    default:                                return $"Most {entity.ToReadableString()} {action.ToReadableString()}";
+                    default:                       return $"Most {entity.ToReadableString()} {action.ToReadableString()}";
 
                     case MinecraftAction.Used:     return $"Most times {entity.ToReadableString()} {action.ToReadableString()}";
                     case MinecraftAction.KilledBy: return $"Most times {action.ToReadableString()} {entity.ToReadableString()}";
@@ -170,7 +182,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
             {
                 switch (action)
                 {
-                    default:                                return $"**{username}** has {action.ToReadableString()} **{amount}** {entity.ToReadableString()}.";
+                    default:                       return $"**{username}** has {action.ToReadableString()} **{amount}** {entity.ToReadableString()}.";
 
                     case MinecraftAction.Used:     return $"**{username}** has {action.ToReadableString()} {entity.ToReadableString()} **{amount}** time(s).";
                     case MinecraftAction.KilledBy: return $"**{username}** has been {action.ToReadableString()} {entity.ToReadableString()} **{amount}** time(s).";

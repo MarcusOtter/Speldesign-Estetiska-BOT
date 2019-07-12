@@ -58,6 +58,13 @@ namespace SpeldesignBotCore.Modules.Minecraft
         public async Task<(MinecraftPlayer player, int amount)[]> GetPlayersWithMostInStatisticAsync<TEnum>(TEnum entity, MinecraftAction action, int playersToReturnAmount = 5)
         {
             var entityName = entity.ToMinecraftJsonString();
+
+            // General statistics have a different naming convention (one that isn't a convention) so their name need to be handled separetely.
+            if (entity is MinecraftStatistic)
+            {
+                entityName = ((MinecraftStatistic) Enum.Parse(typeof(MinecraftStatistic), entity.ToString())).ToNamespacedId();
+            }
+
             var actionName = action.ToMinecraftJsonString();
 
             // Not super clean, I'm sure there's a better way to create these tuples below
