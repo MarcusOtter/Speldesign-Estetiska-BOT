@@ -64,7 +64,7 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void MinecraftStringHelper_ToMinecraftJsonString_CorrectOutputForActionTest()
         {
-            const MinecraftStatisticAction input1 = MinecraftStatisticAction.PickedUp;
+            const MinecraftAction input1 = MinecraftAction.PickedUp;
             const string expected = "minecraft:picked_up";
 
             var actual = input1.ToMinecraftJsonString();
@@ -75,7 +75,7 @@ namespace SpeldesignBotCore.xUnit.Tests
         [Fact]
         public void MinecraftStringHelper_ToMinecraftJsonString_CorrectOutputForStatisticTest()
         {
-            const MinecraftGeneralStatistic input1 = MinecraftGeneralStatistic.MobKills;
+            const MinecraftStatistic input1 = MinecraftStatistic.MobKills;
             const string expected = "minecraft:mob_kills";
 
             var actual = input1.ToMinecraftJsonString();

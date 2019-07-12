@@ -1,6 +1,6 @@
 ﻿namespace SpeldesignBotCore.Modules.Minecraft.Entities
 {
-    public enum MinecraftStatisticAction
+    public enum MinecraftAction
     {
         Invalid = 0,
         Crafted,
