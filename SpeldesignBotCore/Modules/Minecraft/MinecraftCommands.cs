@@ -73,7 +73,7 @@ namespace SpeldesignBotCore.Modules.Minecraft
                 if (!statisticIsValid)
                 {
                     var closestMatches = Enum.GetNames(typeof(MinecraftStatistic)).FindClosestMatch(statisticString).Take(5).ToArray();
-                    await SendNotFoundErrorAsync($"__Could not find statistic \"{statisticIsValid.ToReadableString()}\"__", closestMatches);
+                    await SendNotFoundErrorAsync($"__Could not find statistic \"{statisticString.ToReadableString()}\"__", closestMatches);
                     return;
                 }
 
@@ -180,6 +180,46 @@ namespace SpeldesignBotCore.Modules.Minecraft
 
             private string GetStatisticStringForAction<TEnum>(MinecraftAction action, TEnum entity, string username, int amount)
             {
+                if (action is MinecraftAction.Custom)
+                {
+                    var statistic = (MinecraftStatistic) Enum.Parse(typeof(MinecraftStatistic), entity.ToString());
+
+                    switch (statistic)
+                    {
+                        default: return $"**{username}** has **{amount}** {statistic.ToReadableString()}.";
+
+                        // Time in ticks
+                        case MinecraftStatistic.SneakTime:
+                        case MinecraftStatistic.SinceLastDeath:
+                        case MinecraftStatistic.SinceLastRest:
+                        case MinecraftStatistic.TimePlayed:
+                            var timeSpan = new TimeSpan(0, 0, (int) (amount * 0.05f));
+                            return timeSpan.TotalDays > 1
+                                ? $"**{username}** has **{timeSpan.TotalDays.ToString("0.#")} days** {statistic.ToReadableString()}."
+                                : $"**{username}** has **{timeSpan.TotalHours.ToString("0.#")} hours** {statistic.ToReadableString()}.";
+
+                        // Distance in cm
+                        case MinecraftStatistic.DistanceByBoat:
+                        case MinecraftStatistic.DistanceByElytra:
+                        case MinecraftStatistic.DistanceByHorse:
+                        case MinecraftStatistic.DistanceByMinecart:
+                        case MinecraftStatistic.DistanceByPig:
+                            return $"**{username}** has traveled **{amount / 100}** blocks {statistic.ToReadableString().Replace("distance ", "")}.";
+                        
+                        // Distance in cm
+                        case MinecraftStatistic.DistanceClimbed:
+                        case MinecraftStatistic.DistanceCrouched:
+                        case MinecraftStatistic.DistanceFallen:
+                        case MinecraftStatistic.DistanceFlown:
+                        case MinecraftStatistic.DistanceSprinted:
+                        case MinecraftStatistic.DistanceSwum:
+                        case MinecraftStatistic.DistanceWalked:
+                        case MinecraftStatistic.DistanceWalkedOnWater:
+                        case MinecraftStatistic.DistanceWalkedUnderWater:
+                            return $"**{username}** has {statistic.ToReadableString().Replace("distance ", "")} **{amount / 100}** blocks.";
+                    }
+                }
+
                 switch (action)
                 {
                     default:                       return $"**{username}** has {action.ToReadableString()} **{amount}** {entity.ToReadableString()}.";
