@@ -12,6 +12,7 @@
     <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Discord.Addons.Interactive" Version="1.0.1" />
     <PackageReference Include="Discord.Net" Version="2.0.0-beta" />
     <PackageReference Include="Unity" Version="5.8.6" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.5.0" />
