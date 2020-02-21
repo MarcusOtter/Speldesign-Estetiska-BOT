@@ -1,21 +1,36 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using SpeldesignBotCore.Contests;
 using SpeldesignBotCore.Entities;
 
 namespace SpeldesignBotCore
 {
     public class DiscordCommandHandler
     {
+        private readonly DiscordSocketClient _client;
         private readonly CommandService _commandService;
         private readonly BotConfiguration _botConfiguration;
+        private readonly IServiceProvider _serviceProvider;
 
-        public DiscordCommandHandler(CommandService commandService, BotConfiguration botConfiguration)
+        public DiscordCommandHandler(DiscordSocketClient client, CommandService commandService, BotConfiguration botConfiguration, ContestHandler reactionHandler)
         {
+            _client = client;
             _commandService = commandService;
             _botConfiguration = botConfiguration;
+
+            _serviceProvider = new ServiceCollection()
+                .AddSingleton(_client)
+                .AddSingleton(_commandService)
+                .AddSingleton(this)
+                .AddSingleton(reactionHandler)
+                .AddSingleton<InteractiveService>()
+                .BuildServiceProvider();
         }
 
         public async Task InstallCommands()
@@ -35,7 +50,7 @@ namespace SpeldesignBotCore
                 return;
             }
 
-            var result = await _commandService.ExecuteAsync(context, argPos);
+            var result = await _commandService.ExecuteAsync(context, argPos, _serviceProvider);
 
             if (result.IsSuccess) { return; }
 

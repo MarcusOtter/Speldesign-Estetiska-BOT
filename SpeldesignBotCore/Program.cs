@@ -9,11 +9,8 @@ namespace SpeldesignBotCore
         {
             Unity.RegisterTypes();
 
-            var commandHandler = Unity.Resolve<DiscordCommandHandler>();
-            await commandHandler.InstallCommands();
-
-            var connection = Unity.Resolve<Connection>();
-            await connection.ConnectAsync(Unity.Resolve<BotConfiguration>());
+            await Unity.Resolve<DiscordCommandHandler>().InstallCommands();
+            await Unity.Resolve<Connection>().ConnectAsync(Unity.Resolve<BotConfiguration>());
         }
     }
 }

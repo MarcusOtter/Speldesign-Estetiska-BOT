@@ -21,7 +21,7 @@ namespace SpeldesignBotCore
         {
             get
             {
-                if (_container == null) RegisterTypes();
+                if (_container == null) { RegisterTypes(); }
                 return _container;
             }
         }
@@ -35,11 +35,12 @@ namespace SpeldesignBotCore
 
             _container.RegisterType<DiscordSocketConfig>(new InjectionFactory(i => SocketConfig.GetDefault())); // Return default config when asking for a DiscordSocketConfig
             _container.RegisterSingleton<DiscordSocketClient>(new InjectionConstructor(typeof(DiscordSocketConfig))); // Make DiscordSocketClient use the constructor with DiscordSocketConfig
+            _container.RegisterSingleton<CommandService>();
 
             _container.RegisterSingleton<StatusLogger>();
 
-            _container.RegisterSingleton<CommandService>();
             _container.RegisterSingleton<DiscordCommandHandler>();
+            _container.RegisterSingleton<ContestHandler>();
             _container.RegisterSingleton<DiscordMessageLogger>();
 
             _container.RegisterSingleton<MinecraftServerDataProvider>();
