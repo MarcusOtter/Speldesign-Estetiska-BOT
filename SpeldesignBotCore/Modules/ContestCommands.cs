@@ -48,7 +48,7 @@ namespace SpeldesignBotCore.Modules
                 .WithTitle("🏆 New contest created! 🏆")
                 .WithDescription($"**{contest.Title}**\nSend your contest submissions in {contestSubmissionChannel.Mention}.\n*Make sure that {Context.Client.CurrentUser.Mention} is online when you submit!*")
                 .WithColor(new Color(118, 196, 177))
-                .WithFooter($"🎁 Enter the contest to have a chance to win rewards once it closes 🎁");
+                .WithFooter($"🎁 Enter the contest to have a chance to win rewards once it closes!");
 
             await ReplyAsync("", embed: embed.Build());
 
@@ -70,7 +70,7 @@ namespace SpeldesignBotCore.Modules
 
                 if (closeMatches.Any())
                 {
-                    await ReplyAsync($"Did you mean: \n`{string.Join("`, `", closeMatches)}`");
+                    await ReplyAsync($":bulb: Did you mean: \n\t• `{string.Join("`\n\t• `", closeMatches)}`");
                 }
 
                 return;
@@ -117,7 +117,7 @@ namespace SpeldesignBotCore.Modules
         public async Task ListActiveContests()
         {
             var contests = _contestHandler.GetAllContests();
-            var activeContests = contests?.Where(x => x.IsActive);
+            var activeContests = contests?.Where(x => x.State is ContestState.TakingSubmissions || x.State is ContestState.VotingPeriod);
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle("Active contests")
@@ -143,7 +143,7 @@ namespace SpeldesignBotCore.Modules
         public async Task ListInactiveContests()
         {
             var contests = _contestHandler.GetAllContests();
-            var inactiveContests = contests?.Where(x => !x.IsActive);
+            var inactiveContests = contests?.Where(x => x.State is ContestState.Closed);
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle("Inactive contests")

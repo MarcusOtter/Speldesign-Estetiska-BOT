@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SpeldesignBotCore.Contests;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace SpeldesignBotCore.Entities
         public readonly ulong SubmissionChannelId;
 
         public string Title { get; set; }
-        public bool IsActive { get; set; }
+        public ContestState State { get; set; }
         public DateTime EndDateUtc { get; set; }
 
         private readonly List<ContestSubmission> _submissions = new List<ContestSubmission>();
@@ -18,7 +19,7 @@ namespace SpeldesignBotCore.Entities
         {
             Title = title;
             SubmissionChannelId = submissionChannelId;
-            IsActive = true;
+            State = ContestState.TakingSubmissions;
         }
 
         public int GetAmountOfSubmissions() => _submissions.Count;
@@ -26,9 +27,9 @@ namespace SpeldesignBotCore.Entities
 
         public void Close()
         {
-            if (!IsActive) { return; }
+            if (State is ContestState.Closed) { return; }
 
-            IsActive = false;
+            State = ContestState.Closed;
             EndDateUtc = DateTime.UtcNow;
         }
 
