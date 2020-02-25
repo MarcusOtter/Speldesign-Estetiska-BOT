@@ -1,5 +1,6 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
+using SpeldesignBotCore.Contests;
 using SpeldesignBotCore.Entities;
 using SpeldesignBotCore.Loggers;
 using SpeldesignBotCore.Modules.Giveaways;

@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
-using static Newtonsoft.Json.JsonConvert;
 
 namespace SpeldesignBotCore.Storage.Implementations
 {
@@ -21,7 +20,7 @@ namespace SpeldesignBotCore.Storage.Implementations
                 throw new System.ArgumentException($"The provided key '{key}' could not be found.");
             }
 
-            return DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         public void StoreObject(object obj, string key)
@@ -35,7 +34,7 @@ namespace SpeldesignBotCore.Storage.Implementations
             }
 
             Directory.CreateDirectory(directoryName);
-            var json = SerializeObject(obj, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
             File.WriteAllText(filePath, json);
         }
     }

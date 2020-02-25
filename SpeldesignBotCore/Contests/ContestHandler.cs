@@ -1,69 +1,130 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using SpeldesignBotCore.Entities;
-using SpeldesignBotCore.Loggers;
+﻿using SpeldesignBotCore.Entities;
 using SpeldesignBotCore.Storage;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SpeldesignBotCore.Contests
 {
     public class ContestHandler
     {
-        private readonly bool _contestIsInProgress;
-
+        private const string _contestsStoragePath = "Info/Contests";
         private readonly IDataStorage _dataStorage;
-        private readonly ContestSubmission[] _submissions;
+
+        private bool ContestFileExists => _dataStorage.HasObject(_contestsStoragePath);
 
         public ContestHandler(IDataStorage dataStorage)
         {
             _dataStorage = dataStorage;
         }
 
-        private bool IsContestSubmission(ulong messageId) => _submissions.Any(x => x.MessageId == messageId);
-
-        public void AddReactionAction(ulong messageId, Emote emote, ActionOnReactionMessage.ReactionAction action)
+        public void SaveNewContest(Contest newContest)
         {
-            if (IsContestSubmission(messageId))
+            if (!ContestFileExists) 
             {
-                _actionOnReactionMessages[messageId].AddAction(emote, action);
+                _dataStorage.StoreObject(new List<Contest>() { newContest }, _contestsStoragePath);
+                return;
             }
-            else
-            {
-                var actionOnReactionMessage = new ActionOnReactionMessage(messageId, (emote, action));
-                _actionOnReactionMessages.Add(messageId, actionOnReactionMessage);
-            }
+
+            var contests = _dataStorage.RestoreObject<List<Contest>>(_contestsStoragePath);
+            contests.Add(newContest);
+            _dataStorage.StoreObject(contests, _contestsStoragePath);
         }
 
-        public void RemoveReactionAction(ulong messageId, Emote emote)
+        public void CloseContest(Contest contest)
         {
-            if (!IsContestSubmission(messageId)) { throw new System.ArgumentException("This message does not have any reaction actions"); }
+            if (!ContestFileExists) { return; }
+            if (!contest.IsActive) { return; }
 
-            var actionOnReactionMessage = _actionOnReactionMessages[messageId];
+            var contests = _dataStorage.RestoreObject<List<Contest>>(_contestsStoragePath);
 
-            if (!actionOnReactionMessage.HasActionFor(emote)) { throw new System.ArgumentException("This message does not have an action for the given emoji"); }
+            var index = contests.FindIndex(x => x.Title.ToLower() == contest.Title.ToLower());
+            contests.RemoveAt(index);
+            contest.Close();
+            contests.Add(contest);
 
-            actionOnReactionMessage.RemoveAction(emote);
+            _dataStorage.StoreObject(contests, _contestsStoragePath);
         }
-
-        public async Task HandleReactionAdded(Cacheable<IUserMessage, ulong> before, ISocketMessageChannel channel, SocketReaction reaction)
+        
+        public void DeleteContest(Contest contest)
         {
-            if (reaction.User.Value.IsBot) { return; }
+            if (!ContestFileExists) { return; }
 
-            var emote = (Emote) reaction.Emote;
-            var message = (SocketUserMessage) await channel.GetMessageAsync(reaction.MessageId);
+            var contests = _dataStorage.RestoreObject<List<Contest>>(_contestsStoragePath);
 
-            if (!IsContestSubmission(message.Id)) { return; }
+            var index = contests.FindIndex(x => x.Title.ToLower() == contest.Title.ToLower());
+            contests.RemoveAt(index);
 
-            var actionReactionMessage = _actionOnReactionMessages[message.Id];
-
-            if (!actionReactionMessage.HasActionFor(emote)) { return; }
-
-            var context = new SocketCommandContext(_dataStorage, message);
-            await actionReactionMessage.RunActionAsync(emote, context);
-
-            Unity.Resolve<StatusLogger>().LogToConsole($"Reaction with name \"{emote.Id}\" by {reaction.User.Value.Username} on message with ID {reaction.MessageId}");
+            _dataStorage.StoreObject(contests, _contestsStoragePath);
         }
+
+        public Contest GetContestByTitle(string contestTitle)
+        {
+            if (!ContestFileExists) { return null; }
+
+            var contests = _dataStorage.RestoreObject<Contest[]>(_contestsStoragePath);
+            return contests.FirstOrDefault(x => x.Title.ToLower() == contestTitle.ToLower());
+        }
+
+        public bool ContestTitleExists(string contestTitle)
+        {
+            if (!ContestFileExists) { return false; }
+
+            var contests = _dataStorage.RestoreObject<Contest[]>(_contestsStoragePath);
+            return contests.Any(x => x.Title.ToLower() == contestTitle.ToLower());
+        }
+
+        public Contest[] GetAllContests()
+        {
+            if (!ContestFileExists) { return null; }
+            return _dataStorage.RestoreObject<Contest[]>(_contestsStoragePath);
+        }
+
+
+        //private bool IsContestSubmission(ulong messageId) => _submissions.Any(x => x.MessageId == messageId);
+
+
+
+        //public void AddReactionAction(ulong messageId, Emote emote, ActionOnReactionMessage.ReactionAction action)
+        //{
+        //    if (IsContestSubmission(messageId))
+        //    {
+        //        _actionOnReactionMessages[messageId].AddAction(emote, action);
+        //    }
+        //    else
+        //    {
+        //        var actionOnReactionMessage = new ActionOnReactionMessage(messageId, (emote, action));
+        //        _actionOnReactionMessages.Add(messageId, actionOnReactionMessage);
+        //    }
+        //}
+
+        //public void RemoveReactionAction(ulong messageId, Emote emote)
+        //{
+        //    if (!IsContestSubmission(messageId)) { throw new System.ArgumentException("This message does not have any reaction actions"); }
+
+        //    var actionOnReactionMessage = _actionOnReactionMessages[messageId];
+
+        //    if (!actionOnReactionMessage.HasActionFor(emote)) { throw new System.ArgumentException("This message does not have an action for the given emoji"); }
+
+        //    actionOnReactionMessage.RemoveAction(emote);
+        //}
+
+        //public async Task HandleReactionAdded(Cacheable<IUserMessage, ulong> before, ISocketMessageChannel channel, SocketReaction reaction)
+        //{
+        //    if (reaction.User.Value.IsBot) { return; }
+
+        //    var emote = (Emote) reaction.Emote;
+        //    var message = (SocketUserMessage) await channel.GetMessageAsync(reaction.MessageId);
+
+        //    if (!IsContestSubmission(message.Id)) { return; }
+
+        //    var actionReactionMessage = _actionOnReactionMessages[message.Id];
+
+        //    if (!actionReactionMessage.HasActionFor(emote)) { return; }
+
+        //    var context = new SocketCommandContext(_dataStorage, message);
+        //    await actionReactionMessage.RunActionAsync(emote, context);
+
+        //    Unity.Resolve<StatusLogger>().LogToConsole($"Reaction with name \"{emote.Id}\" by {reaction.User.Value.Username} on message with ID {reaction.MessageId}");
+        //}
     }
 }

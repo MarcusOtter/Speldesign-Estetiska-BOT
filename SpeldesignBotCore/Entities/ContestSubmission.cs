@@ -1,16 +1,21 @@
-﻿namespace SpeldesignBotCore.Entities
+﻿using System.Collections.Generic;
+
+namespace SpeldesignBotCore.Entities
 {
     public class ContestSubmission
     {
-        public readonly ulong ChannelId;
         public readonly ulong MessageId;
+        public readonly ulong AuthorId;
+        // int placement
 
-        private ulong[] _votingUsers;
+        private readonly List<ulong> _votingUsersIds = new List<ulong>();
 
-        public ContestSubmission(ulong channelId, ulong messageId)
+        public ContestSubmission(ulong messageId, ulong authorId)
         {
-            ChannelId = channelId;
             MessageId = messageId;
+            AuthorId = authorId;
         }
+
+        public List<ulong> GetAllVotersIds() => _votingUsersIds;
     }
 }
