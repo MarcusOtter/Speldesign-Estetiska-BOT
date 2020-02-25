@@ -5,6 +5,6 @@
     {
         TakingSubmissions,
         VotingPeriod,
-        Closed
+        Ended
     }
 }

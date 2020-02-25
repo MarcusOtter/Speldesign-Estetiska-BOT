@@ -33,7 +33,7 @@ namespace SpeldesignBotCore.Contests
         public void CloseContest(Contest contest)
         {
             if (!ContestFileExists) { return; }
-            if (contest.State is ContestState.Closed) { return; }
+            if (contest.State is ContestState.VotingPeriod) { return; }
 
             var contests = _dataStorage.RestoreObject<List<Contest>>(_contestsStoragePath);
 

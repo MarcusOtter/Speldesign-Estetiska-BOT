@@ -27,9 +27,9 @@ namespace SpeldesignBotCore.Entities
 
         public void Close()
         {
-            if (State is ContestState.Closed) { return; }
+            if (State is ContestState.VotingPeriod) { return; }
 
-            State = ContestState.Closed;
+            State = ContestState.VotingPeriod;
             EndDateUtc = DateTime.UtcNow;
         }
 

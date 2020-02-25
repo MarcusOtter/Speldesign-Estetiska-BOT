@@ -139,11 +139,12 @@ namespace SpeldesignBotCore.Modules
         }
 
         [Command("contest list inactive")]
+        [Alias("contest list ended")]
         [Summary("Lists inactive contests"), Remarks("contest list inactive")]
         public async Task ListInactiveContests()
         {
             var contests = _contestHandler.GetAllContests();
-            var inactiveContests = contests?.Where(x => x.State is ContestState.Closed);
+            var inactiveContests = contests?.Where(x => x.State is ContestState.Ended);
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle("Inactive contests")
