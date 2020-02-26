@@ -18,16 +18,10 @@ namespace SpeldesignBotCore.Modules
 
         [Command("contest create")]
         [Alias("contest new", "contest add", "contest start")]
-        [Summary("Creates a new contest and starts it"), Remarks("contest create [#submissionChannel] [contest title]")]
+        [Summary("Creates a new contest and starts it"), Remarks("contest create [contest title]")]
         [RequireUserPermission(GuildPermission.KickMembers)]
-        public async Task NewContestSetup(ITextChannel contestSubmissionChannel, [Remainder] string contestTitle = "")
+        public async Task NewContestSetup([Remainder] string contestTitle)
         {
-            if (string.IsNullOrWhiteSpace(contestTitle))
-            {
-                await ReplyAsync("You must give the contest a title.");
-                return;
-            }
-
             if (contestTitle.Length > 100)
             {
                 await ReplyAsync("The contest title cannot be over 100 characters long.");
@@ -40,13 +34,13 @@ namespace SpeldesignBotCore.Modules
                 return;
             }
 
-            var contest = new Contest(contestTitle, contestSubmissionChannel.Id);
+            var contest = new Contest(contestTitle, Context.Channel.Id);
 
             _contestHandler.SaveNewContest(contest);
 
             var embed = new EmbedBuilder()
                 .WithTitle("🏆 New contest created! 🏆")
-                .WithDescription($"**{contest.Title}**\nSend your contest submissions in {contestSubmissionChannel.Mention}.\n*Make sure that {Context.Client.CurrentUser.Mention} is online when you submit!*")
+                .WithDescription($"**{contest.Title}**\nSend your contest submissions in {((ITextChannel) Context.Channel).Mention}.\n*Make sure that {Context.Client.CurrentUser.Mention} is online when you submit!*")
                 .WithColor(new Color(118, 196, 177))
                 .WithFooter($"🎁 Enter the contest to have a chance to win rewards once it closes!");
 
@@ -55,9 +49,9 @@ namespace SpeldesignBotCore.Modules
             await Context.Message.DeleteAsync();
         }
 
-        [Command("contest end")]
-        [Alias("contest stop", "contest close")]
-        [Summary("Ends the contest and sends rewards to the winners"), Remarks("contest end [contest title]")]
+        [Command("contest close")]
+        [Alias("contest stop")]
+        [Summary("Closes the contest for submissions and starts a voting period"), Remarks("contest end [contest title]")]
         [RequireUserPermission(GuildPermission.KickMembers)]
         public async Task EndContest([Remainder] string contestTitle)
         {
