@@ -2,6 +2,7 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using SpeldesignBotCore.Contests;
 using SpeldesignBotCore.Entities;
 using SpeldesignBotCore.Loggers;
 using SpeldesignBotCore.Registration;
@@ -15,16 +16,32 @@ namespace SpeldesignBotCore
         private readonly DiscordMessageLogger _messageLogger;
         private readonly DiscordCommandHandler _commandHandler;
         private readonly RegistrationHandler _registrationHandler;
+        private readonly ContestHandler _contestHandler;
 
         public DiscordMessageHandler(DiscordSocketClient client, BotConfiguration config,
                                      DiscordMessageLogger logger, DiscordCommandHandler commandHandler,
-                                     RegistrationHandler registrationHandler)
+                                     RegistrationHandler registrationHandler, ContestHandler contestHandler)
         {
             _client = client;
             _botConfig = config;
             _messageLogger = logger;
             _commandHandler = commandHandler;
             _registrationHandler = registrationHandler;
+            _contestHandler = contestHandler;
+        }
+
+        public async Task HandleReactionAddedAsync(Cacheable<IUserMessage, ulong> before, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            var contestsInVotingPeriod = _contestHandler.GetContestsInState(ContestState.VotingPeriod);
+            if (contestsInVotingPeriod.Length is 0) { return; }
+
+            foreach (var contest in contestsInVotingPeriod)
+            {
+                if (contest.SubmissionChannelId != channel.Id) { continue; }
+                // check message id
+                // check if user has already voted in this contest (if so, change votes)
+                // probably have contest handler deal with all of this stuff anyways
+            }
         }
 
         public async Task HandleMessageEditedAsync(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel)
@@ -68,8 +85,8 @@ namespace SpeldesignBotCore
             if (context.User.IsBot) { return; }
             if (msg is null) { return; }
 
-            // If this is a DM, no logging or registration should happen,
-            // so just handle command and return.
+            // If this is a DM no logging, registration, or contest submission
+            // should happen, so just handle command and return.
             if (context.IsPrivate)
             {
                 await _commandHandler.HandleCommand(msg, context);
@@ -84,7 +101,15 @@ namespace SpeldesignBotCore
                 return;
             }
 
-            await _commandHandler.HandleCommand(msg, context);
+            int argPos = 0;
+            if (_commandHandler.MessageContainsCommandInvocation(msg, context, ref argPos))
+            {
+                await _commandHandler.HandleCommand(msg, context);
+            }
+            else if (_contestHandler.ChannelIsContestSubmissionChannel(context.Channel.Id))
+            {
+                await _contestHandler.TryAddNewContestSubmission(context);
+            }
         }
     }
 }

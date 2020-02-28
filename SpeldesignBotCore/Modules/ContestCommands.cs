@@ -3,7 +3,7 @@ using Discord.Commands;
 using System.Threading.Tasks;
 using SpeldesignBotCore.Contests;
 using SpeldesignBotCore.Entities;
-using System.Linq;
+using System;
 
 namespace SpeldesignBotCore.Modules
 {
@@ -40,29 +40,73 @@ namespace SpeldesignBotCore.Modules
 
             var embed = new EmbedBuilder()
                 .WithTitle("🏆 New contest created! 🏆")
-                .WithDescription($"**{contest.Title}**\nSend your contest submissions in {((ITextChannel) Context.Channel).Mention}.\n*Make sure that {Context.Client.CurrentUser.Mention} is online when you submit!*")
+                .AddField("Contest title", $"**{contest.Title}**")
+                .AddField("How to enter the contest",
+                    $"Make a contest submission in this channel ({((ITextChannel) Context.Channel).Mention}) by simply sending __**one**__ message with any images/links/text of your submission. " +
+                    "Sending multiple messages will not work, so make sure to add all attachments to the message before sending it.")
+                .AddField("Other important information", 
+                    ":warning: **Please __do not__ send questions or other messages in this channel!**\n" +
+                    "This channel is only used for submissions.\n\n" +
+                    $"*Make sure that {Context.Client.CurrentUser.Mention} is online when you submit!*")
                 .WithColor(new Color(118, 196, 177))
                 .WithFooter($"🎁 Enter the contest to have a chance to win rewards once it closes!");
 
-            await ReplyAsync("", embed: embed.Build());
+            var contestInstructions = await ReplyAsync("", embed: embed.Build());
+            await contestInstructions.PinAsync();
 
             await Context.Message.DeleteAsync();
         }
 
-        [Command("contest close")]
-        [Alias("contest stop")]
-        [Summary("Closes the contest for submissions and starts a voting period"), Remarks("contest end [contest title]")]
+        [Command("contest submissions")]
+        [Alias("contest entries")]
+        [Summary("Lists all the submissions in the given contest"), Remarks("contest submissions [contest title]")]
+        public async Task ListSubmissions([Remainder] string contestTitle)
+        {
+            if (!_contestHandler.ContestTitleExists(contestTitle))
+            {
+                await ReplyAsync($"A contest with the name \"{contestTitle}\" does not exist.");
+                return;
+            }
+
+            var contest = _contestHandler.GetContestByTitle(contestTitle);
+
+            if (contest.Submissions is null || contest.Submissions.Count == 0)
+            {
+                await ReplyAsync("There are no submissions for this contest yet.");
+                return;
+            }
+
+            var contestChannel = Context.Guild.GetTextChannel(contest.SubmissionChannelId);
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle($"Submissions for the contest \"{contest.Title}\"")
+                .WithColor(new Color(118, 196, 177));
+
+            foreach (var submission in contest.Submissions)
+            {
+                var author = Context.Guild.GetUser(submission.AuthorId);
+                var message = await contestChannel.GetMessageAsync(submission.MessageId);
+                embedBuilder.AddField($"{author.Nickname ?? author.Username} ({message.Timestamp.ToLocalTime().ToString("dd/MM HH:mm")})",
+                    $"[See submission](https://discordapp.com/channels/{Context.Guild.Id}/{contestChannel.Id}/{message.Id})",
+                    inline: true);
+            }
+
+            await ReplyAsync("", embed: embedBuilder.Build());
+        }
+
+        [Command("contest close submissions")]
+        [Alias("contest end submissions")]
+        [Summary("Closes the contest for submissions and starts a voting period"), Remarks("contest close submissions [contest title]")]
         [RequireUserPermission(GuildPermission.KickMembers)]
-        public async Task EndContest([Remainder] string contestTitle)
+        public async Task CloseContest([Remainder] string contestTitle)
         {
             if (!_contestHandler.ContestTitleExists(contestTitle))
             {
                 await ReplyAsync($"A contest with the name \"{contestTitle}\" does not exist.");
 
-                var allContestTitles = _contestHandler.GetAllContests().Select(x => x.Title).ToArray();
+                var allContestTitles = _contestHandler.GetStoredContestNames();
                 var closeMatches = allContestTitles.FindClosestMatch(contestTitle, 6);
 
-                if (closeMatches.Any())
+                if (closeMatches.Length is 0)
                 {
                     await ReplyAsync($":bulb: Did you mean: \n\t• `{string.Join("`\n\t• `", closeMatches)}`");
                 }
@@ -71,18 +115,85 @@ namespace SpeldesignBotCore.Modules
             }
 
             var contest = _contestHandler.GetContestByTitle(contestTitle);
-            _contestHandler.CloseContest(contest);
 
-            await ReplyAsync($"Closed contest \"{contest.Title}\".");
+            if (contest.Submissions.Count == 0)
+            {
+                _contestHandler.DeleteContest(contest);
+                await ReplyAsync("Since there were no submissions in this contest, it has been deleted.");
+                return;
+            }
 
-            // TODO: start voting period (2 days?)
-            // enum with state, not started, taking submissions, voting period, ended
-            // contest needs a voting message id and like.. store an emoji for every contest submission maybe lol
-            await ReplyAsync(":tada: PRIZES FOR EVERYONE :tada: :trophy:");
+            var endTime = DateTime.Now.AddDays(2);
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle($"Who should win the contest \"{contest.Title}\"?")
+                .WithDescription(
+                    "Vote using the reactions below!\n\n" +
+                    "• The contestants have been given random emojis.\n" +
+                    "• Click the link below a submission to look at it again.\n" +
+                    "• You are only able to vote for one person at a time (not yourself).\n" +
+                    "• The voting is anynonymous, the bot will remove your reaction when it's counted.\n" +
+                    "• To clear your vote, react with :x:\n\n" +
+                    $"*The voting will close on {endTime.ToString("dddd, dd MMMM")} at {endTime.ToString("HH:mm")}.*")
+                .WithColor(new Color(118, 196, 177))
+                .WithFooter("0 votes"); // to be determined programatically
+
+            _contestHandler.RandomizeContestSubmissionEmojis(contest);
+
+            foreach(var submission in contest.Submissions)
+            {
+                var contestant = Context.Guild.GetUser(submission.AuthorId);
+                embedBuilder.AddField($"{contestant.Nickname ?? contestant.Username} ({submission.EmojiRawUnicode})", 
+                    $"[See submission](https://discordapp.com/channels/{Context.Guild.Id}/{contest.SubmissionChannelId}/{submission.MessageId})",
+                    inline: true);
+            }
+
+            var votingMessage = await ReplyAsync("", embed: embedBuilder.Build());
+
+            await Context.Message.DeleteAsync();
+
+            await votingMessage.AddReactionAsync(new Emoji("❌"));
+
+            foreach (var submission in contest.Submissions)
+            {
+                var emoji = new Emoji(submission.EmojiRawUnicode);
+                await votingMessage.AddReactionAsync(emoji);
+            }
+
+            _contestHandler.StartVotingPeriod(contest, votingMessage.Id);
+        }
+
+        [Command("contest submission delete")]
+        [Alias("contest submission remove")]
+        [Summary("Delete a submission from a contest"), Remarks("contest submission delete [@UserToRemove] [contest title]")]
+        [RequireUserPermission(GuildPermission.KickMembers)]
+        public async Task DeleteSubmission(IGuildUser user, [Remainder] string contestTitle)
+        {
+            if (!_contestHandler.ContestTitleExists(contestTitle))
+            {
+                await ReplyAsync($"A contest with the name \"{contestTitle}\" does not exist.");
+                return;
+            }
+
+            var contest = _contestHandler.GetContestByTitle(contestTitle);
+            var submission = _contestHandler.GetContestSubmissionFromUserId(contest, user.Id);
+
+            if (submission == default)
+            {
+                await ReplyAsync($"{user.Mention} does not have a submission in that contest.");
+                return;
+            }
+
+            var contestChannel = Context.Guild.GetTextChannel(contest.SubmissionChannelId);
+            var message = await contestChannel.GetMessageAsync(submission.MessageId);
+            await message?.DeleteAsync();
+
+            _contestHandler.DeleteContestSubmission(submission);
+            await ReplyAsync($"Deleted submission by {user.Mention} in \"{contest.Title}\".");
         }
 
         [Command("contest delete")]
-        [Summary("Delete a contest completely")]
+        [Summary("Delete a contest completely"), Remarks("contest delete [contest title]")]
         [RequireOwner]
         public async Task DeleteContest([Remainder] string contestTitle)
         {
@@ -110,14 +221,13 @@ namespace SpeldesignBotCore.Modules
         [Summary("Lists active contests"), Remarks("contest list active")]
         public async Task ListActiveContests()
         {
-            var contests = _contestHandler.GetAllContests();
-            var activeContests = contests?.Where(x => x.State is ContestState.TakingSubmissions || x.State is ContestState.VotingPeriod);
+            var activeContests = _contestHandler.GetContestsInState(ContestState.TakingSubmissions, ContestState.VotingPeriod);
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle("Active contests")
                 .WithColor(new Color(118, 196, 177));
 
-            if (activeContests is null || activeContests.Count() == 0)
+            if (activeContests is null || activeContests.Length == 0)
             {
                 embedBuilder.WithDescription("There are currently no active contests. You should send your contest ideas to `CalmEyE#8246` or `LeMorrow#8192` :wink:");
                 await ReplyAsync("", embed: embedBuilder.Build());
@@ -126,7 +236,12 @@ namespace SpeldesignBotCore.Modules
 
             foreach (var contest in activeContests)
             {
-                embedBuilder.AddField(contest.Title, $"Submissions: {contest.GetAmountOfSubmissions()}\nVotes: {contest.GetAmountOfVoters()}", inline: true);
+                embedBuilder.AddField(contest.Title,
+                    $"Submissions: {contest.Submissions.Count}\n" +
+                    $"Votes: {contest.GetAmountOfVoters()}\n" +
+                    $"State: {contest.State}\n" +
+                    $"Channel: {Context.Guild.GetTextChannel(contest.SubmissionChannelId).Mention}",
+                    inline: true);
             }
 
             await ReplyAsync("", embed: embedBuilder.Build());
@@ -137,14 +252,13 @@ namespace SpeldesignBotCore.Modules
         [Summary("Lists inactive contests"), Remarks("contest list inactive")]
         public async Task ListInactiveContests()
         {
-            var contests = _contestHandler.GetAllContests();
-            var inactiveContests = contests?.Where(x => x.State is ContestState.Ended);
+            var inactiveContests = _contestHandler.GetContestsInState(ContestState.Ended);
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle("Inactive contests")
                 .WithColor(new Color(118, 196, 177));
 
-            if (inactiveContests is null || inactiveContests.Count() == 0)
+            if (inactiveContests is null || inactiveContests.Length == 0)
             {
                 embedBuilder.WithDescription("There are currently no inactive contests.");
                 await ReplyAsync("", embed: embedBuilder.Build());
@@ -154,9 +268,11 @@ namespace SpeldesignBotCore.Modules
             foreach (var contest in inactiveContests)
             {
                 embedBuilder.AddField(contest.Title, 
-                    $"Submissions: {contest.GetAmountOfSubmissions()}\n" +
+                    $"Submissions: {contest.Submissions.Count}\n" +
                     $"Votes: {contest.GetAmountOfVoters()}\n" +
-                    $"Date closed: {contest.EndDateUtc.ToLocalTime().ToString("dd-MM-yyyy")}", 
+                    $"Date closed: {contest.EndDateUtc.ToLocalTime().ToString("dd-MM-yyyy")}\n" +
+                    $"State: {contest.State}\n" +
+                    $"Channel: {Context.Guild.GetTextChannel(contest.SubmissionChannelId).Mention}",
                     inline: true);
             }
 

@@ -39,17 +39,17 @@ namespace SpeldesignBotCore
             Unity.Resolve<Loggers.StatusLogger>().LogToConsole("Installed command modules");
         }
 
+        public bool MessageContainsCommandInvocation(SocketUserMessage message, SocketCommandContext context, ref int argPos)
+        {
+            return message.HasStringPrefix(_botConfiguration.Prefix, ref argPos)
+                || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos);
+        }
+
         public async Task HandleCommand(SocketUserMessage message, SocketCommandContext context)
         {
             int argPos = 0;
 
-            // If the message doesn't start with a prefix nor a mention of this bot
-            if (!(message.HasStringPrefix(_botConfiguration.Prefix, ref argPos) 
-               || message.HasMentionPrefix(context.Client.CurrentUser, ref argPos)))
-            {
-                return;
-            }
-
+            if (!MessageContainsCommandInvocation(message, context, ref argPos)) { return; }
             var result = await _commandService.ExecuteAsync(context, argPos, _serviceProvider);
 
             if (result.IsSuccess) { return; }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using SpeldesignBotCore.Contests;
@@ -13,16 +14,13 @@ namespace SpeldesignBotCore
         private readonly DiscordSocketClient _client;
         private readonly StatusLogger _statusLogger;
         private readonly DiscordMessageHandler _messageHandler;
-        private readonly ContestHandler _reactionHandler;
         private readonly IDataStorage _storage;
 
-        public Connection(DiscordSocketClient client, StatusLogger statusLogger, DiscordMessageHandler messageHandler, 
-                          ContestHandler reactionHandler, IDataStorage storage)
+        public Connection(DiscordSocketClient client, StatusLogger statusLogger, DiscordMessageHandler messageHandler, IDataStorage storage)
         {
             _client = client;
             _statusLogger = statusLogger;
             _messageHandler = messageHandler;
-            _reactionHandler = reactionHandler;
             _storage = storage;
         }
 
@@ -34,7 +32,7 @@ namespace SpeldesignBotCore
 
             _client.MessageReceived += _messageHandler.HandleMessageSentAsync;
             _client.MessageUpdated += _messageHandler.HandleMessageEditedAsync;
-            //_client.ReactionAdded += _reactionHandler.HandleReactionAdded;
+            _client.ReactionAdded += _messageHandler.HandleReactionAddedAsync;
 
             _client.Ready += ReportStartupTime;
 

@@ -24,7 +24,7 @@ namespace SpeldesignBotCore.Modules
 
             var embedBuilder = GetHelpMessageEmbed();
 
-            IUserMessage dmMessage = null;
+            IUserMessage dmMessage;
 
             try
             {
