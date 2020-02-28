@@ -33,6 +33,7 @@ namespace SpeldesignBotCore
             _client.MessageReceived += _messageHandler.HandleMessageSentAsync;
             _client.MessageUpdated += _messageHandler.HandleMessageEditedAsync;
             _client.ReactionAdded += _messageHandler.HandleReactionAddedAsync;
+            _client.MessageDeleted += _messageHandler.HandleMessageDeletedAsync;
 
             _client.Ready += ReportStartupTime;
 

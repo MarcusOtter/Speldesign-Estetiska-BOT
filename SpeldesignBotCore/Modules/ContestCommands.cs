@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using SpeldesignBotCore.Contests;
 using SpeldesignBotCore.Entities;
 using System;
+using Discord.WebSocket;
 
 namespace SpeldesignBotCore.Modules
 {
@@ -85,7 +86,21 @@ namespace SpeldesignBotCore.Modules
             {
                 var author = Context.Guild.GetUser(submission.AuthorId);
                 var message = await contestChannel.GetMessageAsync(submission.MessageId);
-                embedBuilder.AddField($"{author.Nickname ?? author.Username} ({message.Timestamp.ToLocalTime().ToString("dd/MM HH:mm")})",
+
+                if (author is null)
+                {
+                    embedBuilder.AddField("Missing user", "<missing message>");
+                    continue;
+                }
+
+                if (message is null)
+                {
+                    embedBuilder.AddField($"{author.Nickname ?? author.Username}", "<missing message>");
+                    continue;
+                }
+
+                embedBuilder.AddField(
+                    $"{author.Nickname ?? author.Username} ({message.Timestamp.ToLocalTime().ToString("dd/MM HH:mm")})",
                     $"[See submission](https://discordapp.com/channels/{Context.Guild.Id}/{contestChannel.Id}/{message.Id})",
                     inline: true);
             }
@@ -123,31 +138,7 @@ namespace SpeldesignBotCore.Modules
                 return;
             }
 
-            var endTime = DateTime.Now.AddDays(2);
-
-            var embedBuilder = new EmbedBuilder()
-                .WithTitle($"Who should win the contest \"{contest.Title}\"?")
-                .WithDescription(
-                    "Vote using the reactions below!\n\n" +
-                    "• The contestants have been given random emojis.\n" +
-                    "• Click the link below a submission to look at it again.\n" +
-                    "• You are only able to vote for one person at a time (not yourself).\n" +
-                    "• The voting is anynonymous, the bot will remove your reaction when it's counted.\n" +
-                    "• To clear your vote, react with :x:\n\n" +
-                    $"*The voting will close on {endTime.ToString("dddd, dd MMMM")} at {endTime.ToString("HH:mm")}.*")
-                .WithColor(new Color(118, 196, 177))
-                .WithFooter("0 votes"); // to be determined programatically
-
-            _contestHandler.RandomizeContestSubmissionEmojis(contest);
-
-            foreach(var submission in contest.Submissions)
-            {
-                var contestant = Context.Guild.GetUser(submission.AuthorId);
-                embedBuilder.AddField($"{contestant.Nickname ?? contestant.Username} ({submission.EmojiRawUnicode})", 
-                    $"[See submission](https://discordapp.com/channels/{Context.Guild.Id}/{contest.SubmissionChannelId}/{submission.MessageId})",
-                    inline: true);
-            }
-
+            var embedBuilder = GetVotingEmbedBuilder(contest);
             var votingMessage = await ReplyAsync("", embed: embedBuilder.Build());
 
             await Context.Message.DeleteAsync();
@@ -184,11 +175,19 @@ namespace SpeldesignBotCore.Modules
                 return;
             }
 
+            contest = _contestHandler.DeleteContestSubmission(submission, contest);
             var contestChannel = Context.Guild.GetTextChannel(contest.SubmissionChannelId);
+
+            if (contest.State is ContestState.VotingPeriod)
+            {
+                var votingMessage = (SocketUserMessage) await contestChannel.GetMessageAsync(contest.VotingMessageId);
+                await votingMessage.ModifyAsync((MessageProperties props) => props.Embed = GetVotingEmbedBuilder(contest).Build());
+                // Remove reactions and votes..
+            }
+
             var message = await contestChannel.GetMessageAsync(submission.MessageId);
             await message?.DeleteAsync();
 
-            _contestHandler.DeleteContestSubmission(submission);
             await ReplyAsync($"Deleted submission by {user.Mention} in \"{contest.Title}\".");
         }
 
@@ -277,6 +276,36 @@ namespace SpeldesignBotCore.Modules
             }
 
             await ReplyAsync("", embed: embedBuilder.Build());
+        }
+
+        private EmbedBuilder GetVotingEmbedBuilder(Contest contest)
+        {
+            var endTime = DateTime.Now.AddDays(2);
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle($"Who should win the contest \"{contest.Title}\"?")
+                .WithDescription(
+                    "Vote using the reactions below!\n\n" +
+                    "• The contestants have been given random emojis.\n" +
+                    "• Click the link below a submission to look at it again.\n" +
+                    "• You are only able to vote for one person at a time (not yourself).\n" +
+                    "• The voting is anynonymous, the bot will remove your reaction when it's counted.\n" +
+                    "• To clear your vote, react with :x:\n\n" +
+                    $"*The voting will close on {endTime.ToString("dddd, dd MMMM")} at {endTime.ToString("HH:mm")}.*")
+                .WithColor(new Color(118, 196, 177))
+                .WithFooter("0 votes"); // to be determined programatically
+
+            _contestHandler.RandomizeContestSubmissionEmojis(contest);
+
+            foreach (var submission in contest.Submissions)
+            {
+                var contestant = Context.Guild.GetUser(submission.AuthorId);
+                embedBuilder.AddField($"{contestant.Nickname ?? contestant.Username} ({submission.EmojiRawUnicode})",
+                    $"[See submission](https://discordapp.com/channels/{Context.Guild.Id}/{contest.SubmissionChannelId}/{submission.MessageId})",
+                    inline: true);
+            }
+
+            return embedBuilder;
         }
     }
 }

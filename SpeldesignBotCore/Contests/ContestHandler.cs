@@ -66,23 +66,15 @@ namespace SpeldesignBotCore.Contests
             _dataStorage.StoreObject(contests, _contestsStoragePath);
         }
         
-        public void DeleteContestSubmission(ContestSubmission submission)
+        // Returns the updated contest without the submission
+        public Contest DeleteContestSubmission(ContestSubmission submission, Contest contest)
         {
-            var contests = GetStoredContests();
-            var contest = contests.FirstOrDefault(x => x.Submissions.Any(y => y.AuthorId == submission.AuthorId));
-
-            if (contest == default) { return; }
-
-            // This whole charade might be unnecessary but who cares really
-            var contestIndex = contests.FindIndex(x => x.Title.ToLower() == contest.Title.ToLower());
-            contests.RemoveAt(contestIndex);
-
             var submissionIndex = contest.Submissions.FindIndex(x => x.AuthorId == submission.AuthorId);
             contest.Submissions.RemoveAt(submissionIndex);
 
-            contests.Insert(contestIndex, contest);
+            UpdateContest(contest);
 
-            _dataStorage.StoreObject(contests, _contestsStoragePath);
+            return contest;
         }
 
         public void StartVotingPeriod(Contest contest, ulong votingMessageId)
@@ -135,10 +127,8 @@ namespace SpeldesignBotCore.Contests
                 // If the user has already submitted:
                 if (contest.Submissions.Select(x => x.AuthorId).Any(x => x == context.User.Id)) 
                 {
-                    await context.Message.DeleteAsync();
-
                     var dmChannel = await context.User.GetOrCreateDMChannelAsync();
-                    var errorMessage = $"You have already made a submission to the contest \"{contest.Title}\". Your message has been deleted.";
+                    var errorMessage = $"You have already made a submission to the contest \"{contest.Title}\". Please delete this message: https://discordapp.com/channels/{context.Guild.Id}/{context.Channel.Id}/{context.Message.Id}";
 
                     // Try sending the error message to the user's DM channel.
                     // If they don't allow DMs from this server, send it in the channel instead.
@@ -164,6 +154,12 @@ namespace SpeldesignBotCore.Contests
                 await context.Channel.SendMessageAsync("", embed: embedBuilder.Build());
             }
         }
+
+        public bool MessageIsContestSubmission(ulong messageId)
+            => GetStoredContests()
+                .Any(x => x.Submissions
+                .Select(x => x.MessageId)
+                .Contains(messageId));
 
         // Returns default if none is found
         public ContestSubmission GetContestSubmissionFromUserId(Contest contest, ulong userId)

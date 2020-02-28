@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -42,6 +43,15 @@ namespace SpeldesignBotCore
                 // check if user has already voted in this contest (if so, change votes)
                 // probably have contest handler deal with all of this stuff anyways
             }
+
+
+        }
+
+        public async Task HandleMessageDeletedAsync(Cacheable<IMessage, ulong> deletedMessage, ISocketMessageChannel channel)
+        {
+            if (!_contestHandler.MessageIsContestSubmission(deletedMessage.Id)) { return; }
+
+            // remove the submission if it's in voting or taking submission stage
         }
 
         public async Task HandleMessageEditedAsync(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel)
