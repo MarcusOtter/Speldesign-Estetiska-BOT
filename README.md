@@ -1,4 +1,5 @@
-# Speldesign Estetiska BOT
+<h1 align="center">Speldesign Estetiska BOT</h1>
+<br>
 <p align="center">
   <img a="Speldesign estetiska BOT logo" src="https://images-ext-1.discordapp.net/external/_vHG8tWTHiVQWEugTxxvcR1BY-370reLXVgFw8CX9Mg/%3Fsize%3D64/https/cdn.discordapp.com/avatars/473916590732214272/39b2494dd3b7bcf578ccdc41284ee2f9.png" />
 </p>
@@ -13,6 +14,10 @@
   <img a="Code coverage" src="https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT/branch/master/graph/badge.svg" />
 </p>
 
+<br><br>
+
+## Please note
+This bot is a bit outdated and is undergoing some changes. Most of this information is probably inaccurate.
 
 ## Auto-deployment
 Has the ability to update itself when there are new commits in this repo. The screenshot below is a showcase of this feature. Notice how the GitHub webhook mentions [1b5ce5a - Add uptime command](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/commit/1b5ce5a825f5543f152b92af4b9eadbce9cc08be). This command is then available after the bot has updated.
