@@ -1,12 +1,19 @@
-Speldesign Estetiska BOT
------------------------------
-|  | About  |
-| ---- | :----: |
-| ![Speldesign estetiska BOT logo](https://images-ext-1.discordapp.net/external/_vHG8tWTHiVQWEugTxxvcR1BY-370reLXVgFw8CX9Mg/%3Fsize%3D64/https/cdn.discordapp.com/avatars/473916590732214272/39b2494dd3b7bcf578ccdc41284ee2f9.png) | A discord bot made with .NET Core and :coffee: for game design students from [![Uppsala estetiska gymnasium logo](https://i.imgur.com/ZrpBl85.png "Uppsala kommun") Uppsala estetiska gymnasium](https://estetiska.uppsala.se/blielev/speldesign/).<br>Currently being hosted on a Raspberry Pi 3 (named LadyBug :beetle:) running Raspbian GNU/Linux 9 (stretch). |
+# Speldesign Estetiska BOT
+<p align="center">
+  <img a="Speldesign estetiska BOT logo" src="https://images-ext-1.discordapp.net/external/_vHG8tWTHiVQWEugTxxvcR1BY-370reLXVgFw8CX9Mg/%3Fsize%3D64/https/cdn.discordapp.com/avatars/473916590732214272/39b2494dd3b7bcf578ccdc41284ee2f9.png" />
+</p>
 
-| Build status | Code coverage |
-| ------ | -------- |
-| [![Build status](https://ci.appveyor.com/api/projects/status/7u45ojhicarcph72?svg=true)](https://ci.appveyor.com/project/LeMorrow/speldesign-estetiska-bot) | [![codecov](https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT/branch/master/graph/badge.svg)](https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT) |
+<p align="center">
+  A discord bot made with .NET Core and :coffee: for game design students from Uppsala estetiska gymnasium <img a="Uppsala estetiska gymnasium logo" src="https://i.imgur.com/ZrpBl85.png" >.<br>
+  Currently hosted on a Raspberry Pi 3 running Raspbian GNU/Linux 9 (stretch).
+</p>
+
+<p align="center">
+  <img a="Build status" src="https://ci.appveyor.com/api/projects/status/7u45ojhicarcph72?svg=true" />
+  <img a="Code coverage" src="https://codecov.io/gh/LeMorrow/Speldesign-Estetiska-BOT/branch/master/graph/badge.svg" />
+</p>
+
+
 ## Auto-deployment
 Has the ability to update itself when there are new commits in this repo. The screenshot below is a showcase of this feature. Notice how the GitHub webhook mentions [1b5ce5a - Add uptime command](https://github.com/LeMorrow/Speldesign-Estetiska-BOT/commit/1b5ce5a825f5543f152b92af4b9eadbce9cc08be). This command is then available after the bot has updated.
 
